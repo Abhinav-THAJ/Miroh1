@@ -1,0 +1,927 @@
+<USER_REQUEST>
+# MIORAH – Luxury Jewellery E-commerce Website Prompt (For Google Antigravity AI)
+
+## PROJECT OVERVIEW
+
+Design and develop a **world-class premium luxury imitation jewellery e-commerce website** for **Miorah – The Reflection of Beauty**.
+
+This should **NOT** look like a Shopify template or a typical jewellery website.
+
+The overall experience should feel like a luxury fashion brand similar to **Aesop, Outhouse Jewellery, Swarovski, Mejuri, Pandora, CaratLane Premium, Cartier, Dior Beauty, and Apple-level product presentation**.
+
+The uploaded reference images are the primary design inspiration. Replicate the overall visual language while creating a completely original UI. Focus on the same editorial luxury aesthetic: asymmetrical layouts, premium typography, cinematic imagery, elegant spacing, layered cards, rich gradients, and immersive interactions.
+
+The website must feel expensive, artistic, minimal, and premium.
+
+---
+
+# DESIGN LANGUAGE
+
+Take inspiration from the uploaded reference.
+
+Key characteristics:
+
+* Editorial luxury layout
+* Dark chocolate luxury background
+* Rich brown gradient overlays
+* Champagne gold accents
+* Large elegant serif typography
+* Mixed grid composition
+* Floating product showcase cards
+* Glassmorphism only where appropriate
+* Luxury card borders
+* High-end fashion magazine style
+* Premium white space
+* Layered sections
+* Immersive storytelling
+* Elegant scroll animations
+* Cinematic transitions
+* Soft shadows
+* Fine borders
+* Smooth rounded corners
+* Product spotlight blocks
+* Large hero visuals
+* Editorial product presentation
+
+Do **NOT** create a traditional ecommerce layout.
+
+Every section should feel unique.
+
+---
+
+# BRAND DETAILS
+
+Business Name
+
+**Miorah**
+
+Tagline
+
+**The Reflection of Beauty**
+
+Business Type
+
+Luxury Imitation Jewellery
+
+Location
+
+Chalakudy, Thrissur, Kerala
+
+Email
+
+[miorah.thereflectionofbeauty@gmail.com](mailto:miorah.thereflectionofbeauty@gmail.com)
+
+Managed By
+
+Amrutha Mohan
+
+---
+
+# BRAND STORY
+
+Miorah is a luxury imitation jewellery brand dedicated to bringing elegance, style, and confidence to every woman.
+
+Every collection blends timeless craftsmanship with contemporary fashion, offering jewellery for weddings, festivals, celebrations, gifting, and everyday elegance.
+
+The brand focuses on premium-quality imitation jewellery that delivers luxury without the premium price.
+
+---
+
+# TECH STACK (Must Use)
+
+## Framework
+
+Next.js 15 (App Router)
+
+React 19
+
+TypeScript
+
+---
+
+## Styling
+
+Tailwind CSS v4
+
+CSS Variables
+
+Container Queries
+
+Responsive Design System
+
+---
+
+## UI Library
+
+Shadcn UI
+
+Radix UI
+
+Lucide React
+
+Class Variance Authority (CVA)
+
+Tailwind Merge
+
+---
+
+## Animations
+
+Framer Motion
+
+GSAP
+
+GSAP ScrollTrigger
+
+Lenis Smooth Scroll
+
+Motion One (where required)
+
+Lottie React
+
+---
+
+## State Management
+
+Zustand
+
+React Context
+
+---
+
+## Data Fetching
+
+TanStack React Query
+
+Axios
+
+---
+
+## Forms
+
+React Hook Form
+
+Zod Validation
+
+---
+
+## Carousel
+
+Embla Carousel
+
+SwiperJS (only if necessary)
+
+---
+
+## Image Handling
+
+Next Image
+
+Blur Placeholder
+
+Responsive Images
+
+Lazy Loading
+
+Image Optimization
+
+---
+
+## Icons
+
+Lucide
+
+Heroicons
+
+---
+
+## Authentication Ready
+
+JWT Ready
+
+NextAuth Compatible
+
+Google Login Ready
+
+---
+
+## Payment Ready
+
+Razorpay Integration Structure
+
+Stripe Ready Architecture
+
+---
+
+## Backend Ready
+
+Node.js
+
+Express.js
+
+REST API Ready
+
+Supabase Compatible
+
+MongoDB Compatible
+
+MySQL Compatible
+
+PostgreSQL Compatible
+
+---
+
+## CMS Ready
+
+Headless CMS Architecture
+
+WordPress API Compatible
+
+Sanity Compatible
+
+Strapi Compatible
+
+---
+
+## Deployment
+
+Vercel
+
+Cloudflare
+
+CDN Optimized
+
+---
+
+## Performance
+
+95+ Lighthouse Score
+
+SEO Optimized
+
+Accessibility Optimized
+
+Core Web Vitals Optimized
+
+Server Components
+
+Dynamic Imports
+
+Code Splitting
+
+Image Compression
+
+Caching
+
+ISR Ready
+
+---
+
+# COLOR PALETTE
+
+Primary Background
+
+Deep Chocolate Brown
+
+#1A0F0A
+
+Luxury Brown
+
+#2D1810
+
+Gradient Brown
+
+#3E241A
+
+Champagne Gold
+
+#D4AF37
+
+Rose Gold
+
+#C28A72
+
+Warm Ivory
+
+#F8F5F2
+
+Pure White
+
+#FFFFFF
+
+Luxury Black
+
+#101010
+
+Muted Text
+
+#9D9D9D
+
+---
+
+# TYPOGRAPHY
+
+Heading
+
+Playfair Display
+
+Sub Heading
+
+Cormorant Garamond
+
+Body
+
+Inter
+
+Luxury Serif Italics
+
+Large Typography
+
+Elegant Letter Spacing
+
+Premium Hierarchy
+
+---
+
+# WEBSITE STRUCTURE
+
+## Navigation
+
+Transparent Navbar
+
+Luxury Blur Effect
+
+Sticky on Scroll
+
+Smooth Animation
+
+Navigation
+
+* Home
+* Collections
+* New Arrivals
+* Best Sellers
+* About
+* Contact
+* Search
+* Wishlist
+* Cart
+* My Account
+
+Desktop Mega Menu
+
+Animated Mobile Menu
+
+---
+
+# HOMEPAGE
+
+## 1. Luxury Hero Section
+
+Inspired directly by the reference.
+
+Editorial split layout.
+
+Large serif heading.
+
+Luxury jewellery photography.
+
+Animated floating jewellery.
+
+Mouse parallax.
+
+Smooth background movement.
+
+Glass CTA.
+
+Buttons
+
+Explore Collection
+
+New Arrivals
+
+Luxury statistics.
+
+---
+
+## 2. Editorial Showcase Grid
+
+Like the uploaded reference.
+
+Mix
+
+Large cards
+
+Small cards
+
+Portrait photography
+
+Product photography
+
+Luxury text overlays
+
+Hover transitions
+
+Interactive cards
+
+---
+
+## 3. Featured Collections
+
+Traditional Jewellery
+
+Onam Collection
+
+Anti Tarnish
+
+Bridal
+
+Budget Friendly
+
+Premium Collection
+
+Each collection should have unique luxury card layouts.
+
+---
+
+## 4. Best Sellers
+
+Editorial horizontal slider.
+
+Luxury product cards.
+
+Wishlist
+
+Quick View
+
+Hover image swap
+
+Floating Add to Cart
+
+Gold hover animations.
+
+---
+
+## 5. New Arrivals
+
+Large premium masonry layout.
+
+Magazine style.
+
+Minimal cards.
+
+Luxury hover effects.
+
+---
+
+## 6. Seasonal Collection
+
+Onam Collection
+
+This section must automatically appear only during the Onam season.
+
+Large editorial banner.
+
+Premium typography.
+
+Countdown timer.
+
+Animated flowers.
+
+Golden particles.
+
+---
+
+## 7. Bridal Collection
+
+Luxury cinematic section.
+
+Wedding inspired.
+
+Elegant background.
+
+Premium CTA.
+
+---
+
+## 8. Anti Tarnish Collection
+
+Modern minimal section.
+
+Luxury icons.
+
+Water Resistant
+
+Skin Friendly
+
+Long Lasting Shine
+
+Daily Wear
+
+---
+
+## 9. Why Choose Miorah
+
+Luxury icon grid.
+
+Premium Finish
+
+Affordable Luxury
+
+Trending Designs
+
+Fast Delivery
+
+Secure Payments
+
+Excellent Customer Support
+
+---
+
+## 10. Testimonials
+
+Luxury cards.
+
+Customer portraits.
+
+Animated slider.
+
+Elegant transitions.
+
+---
+
+## 11. Instagram Feed
+
+Luxury masonry gallery.
+
+Hover animations.
+
+Instagram integration ready.
+
+---
+
+## 12. Newsletter
+
+Luxury subscription block.
+
+Minimal.
+
+Editorial.
+
+---
+
+## 13. Footer
+
+Luxury footer.
+
+About
+
+Quick Links
+
+Collections
+
+Contact
+
+Address
+
+Newsletter
+
+Social Icons
+
+---
+
+# COLLECTIONS
+
+Traditional Collection
+
+Necklaces
+
+Chokers
+
+Haram
+
+Earrings
+
+Chains
+
+Bangles
+
+Rings
+
+---
+
+Onam Collection
+
+Visible only during Onam season.
+
+Necklaces
+
+Chokers
+
+Haram
+
+Chains
+
+Bangles
+
+Earrings
+
+Rings
+
+---
+
+Anti Tarnish
+
+Chains
+
+Bracelets
+
+Bangles
+
+Anklets
+
+Rings
+
+---
+
+Bridal Collection
+
+Bridal Sets
+
+Bridal Necklaces
+
+Bridal Earrings
+
+---
+
+Budget Friendly
+
+Products under ₹500
+
+---
+
+Premium Collection
+
+Products above ₹500
+
+---
+
+New Arrivals
+
+Automatically generated.
+
+---
+
+Best Sellers
+
+Automatically generated based on sales.
+
+---
+
+# PRODUCT PAGE
+
+Luxury gallery.
+
+Large zoom.
+
+Sticky information panel.
+
+Product Details
+
+Product Name
+
+SKU
+
+Category
+
+Price
+
+Offer Price
+
+Description
+
+Material
+
+Colour
+
+Weight
+
+Care Instructions
+
+Availability
+
+Wishlist
+
+Share
+
+Related Products
+
+Recently Viewed
+
+Trust Badges
+
+Luxury checkout CTA.
+
+---
+
+# PRODUCT FILTERS
+
+Category
+
+Collection
+
+Material
+
+Price
+
+Availability
+
+Sort By
+
+Newest
+
+Price Low
+
+Price High
+
+Popularity
+
+Best Selling
+
+---
+
+# SEARCH
+
+AI-like instant search.
+
+Live suggestions.
+
+Product preview.
+
+Category search.
+
+Keyboard navigation.
+
+---
+
+# MY ACCOUNT
+
+Dashboard
+
+Orders
+
+Wishlist
+
+Saved Addresses
+
+Profile
+
+Logout
+
+---
+
+# CART
+
+Luxury side drawer.
+
+Animated.
+
+Coupon
+
+Shipping
+
+Subtotal
+
+Checkout
+
+Recommendations
+
+---
+
+# CONTACT PAGE
+
+Luxury layout.
+
+Interactive contact form.
+
+Embedded Google Map.
+
+Business Details.
+
+Social Links.
+
+WhatsApp CTA.
+
+---
+
+# ABOUT PAGE
+
+Editorial storytelling.
+
+Luxury imagery.
+
+Mission
+
+Vision
+
+Brand Story
+
+Timeline
+
+Premium typography.
+
+---
+
+# MICRO INTERACTIONS
+
+Every button
+
+Luxury hover
+
+Smooth elevation
+
+Magnetic effect
+
+Image tilt
+
+Glass ripple
+
+Cursor interactions
+
+Floating particles
+
+Parallax
+
+Reveal animations
+
+ScrollTrigger transitions
+
+Luxury loading animation
+
+Page transition animation
+
+---
+
+# IMAGE HANDLING
+
+I will provide:
+
+* Hero banners
+* Product images
+* Collection banners
+* Lifestyle images
+
+Create a dynamic folder structure that automatically loads assets using Next.js Image Optimization.
+
+Every product should support:
+
+* 3–6 gallery images
+* Zoom
+* Thumbnail navigation
+* Blur placeholders
+* Responsive image loading
+
+---
+
+# ADMIN READY
+
+Structure the project so an admin panel can easily manage:
+
+* Products
+* Categories
+* Collections
+* Orders
+* Customers
+* Coupons
+* Seasonal Visibility (Onam Collection Toggle)
+* Homepage Banners
+* Testimonials
+* Featured Products
+* New Arrivals
+* Best Sellers
+
+---
+
+# FINAL OBJECTIVE
+
+Create a luxury jewellery shopping experience that looks like a premium international fashion brand rather than a standard ecommerce website. The design should closely reflect the sophisticated editorial style shown in the provided references while remaining unique to **Miorah**. Every detail—from typography and spacing to animations and product presentation—should communicate elegance, craftsmanship, and exclusivity. The codebase must be clean, scalable, production-ready, fully responsive, SEO-optimized, and built using modern best practices with Next.js 15, React 19, TypeScript, Tailwind CSS v4, GSAP, Framer Motion, Shadcn UI, Zustand, and React Query.
+
+
+
+i will add the design reference in the chat attach the photo
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-21T17:01:36+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\abhin\Downloads\Empire\elamy\AGENTS.md (LANGUAGE_MARKDOWN)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\abhin\Downloads\Empire\elamy\AGENTS.md (LANGUAGE_MARKDOWN)
+- c:\Users\abhin\Downloads\Empire\elamy\ecosystem.config.js (LANGUAGE_JAVASCRIPT)
+- c:\Users\abhin\Downloads\Empire\elamy\.env.local (LANGUAGE_UNSPECIFIED)
+- c:\Users\abhin\Downloads\Empire\elamy\src\app\globals.css (LANGUAGE_CSS)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
