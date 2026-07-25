@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingBag, SlidersHorizontal, Search, ArrowUpRight, Check, Star, RefreshCw } from "lucide-react";
 import { ProductDetail, Category } from "@/lib/data";
+import { useCartStore } from "@/store/cartStore";
 
 interface CollectionsClientProps {
   initialProducts: ProductDetail[];
@@ -24,6 +25,7 @@ export default function CollectionsClient({
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [addedCartId, setAddedCartId] = useState<string | number | null>(null);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
+  const addItemToCart = useCartStore((state) => state.addItem);
 
   const [productsList, setProductsList] = useState<ProductDetail[]>(initialProducts);
   const [categoriesList, setCategoriesList] = useState<Category[]>(categories);
@@ -134,8 +136,17 @@ export default function CollectionsClient({
 
   const handleQuickAdd = (id: string | number) => {
     setAddedCartId(id);
-    if (typeof window !== "undefined") {
-      window.location.href = `https://springgreen-rook-492819.hostingersite.com/checkout/?add-to-cart=${id}&quantity=1`;
+    const product = productsList.find(p => p.id === id);
+    if (product) {
+      addItemToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.images?.[0] || "",
+        quantity: 1,
+        color: "Standard",
+      });
     }
     setTimeout(() => setAddedCartId(null), 2000);
   };

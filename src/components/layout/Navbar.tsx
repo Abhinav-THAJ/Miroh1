@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Search, Heart, ShoppingBag, User, Menu, X } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -19,6 +20,10 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
+  const { toggleCart, items } = useCartStore();
+  
+  // Calculate total quantity of items in cart
+  const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
@@ -135,15 +140,17 @@ export default function Navbar() {
           <Link href="/account" className="hover:text-champagne-gold transition-colors hidden sm:block">
             <User size={20} strokeWidth={1.5} />
           </Link>
-          <a 
-            href="https://springgreen-rook-492819.hostingersite.com/cart" 
+          <button 
+            onClick={toggleCart}
             className="hover:text-champagne-gold transition-colors relative"
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
-            <span className="absolute -top-1.5 -right-1.5 bg-champagne-gold text-primary-bg text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              0
-            </span>
-          </a>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-champagne-gold text-primary-bg text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 

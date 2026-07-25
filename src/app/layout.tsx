@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   },
 };
 
+import CartDrawer from "@/components/layout/CartDrawer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,7 +44,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">{children}</body>
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+        {children}
+        <CartDrawer />
+      </body>
     </html>
   );
 }

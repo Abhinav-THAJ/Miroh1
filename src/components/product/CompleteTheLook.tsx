@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus, Check, ShoppingBag, Sparkles } from "lucide-react";
 import { ProductDetail, getProductById } from "@/lib/data";
+import { useCartStore } from "@/store/cartStore";
 
 interface CompleteTheLookProps {
   currentProduct: ProductDetail;
@@ -20,6 +21,7 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
     String(currentProduct.id),
   ]);
   const [bundleAdded, setBundleAdded] = useState(false);
+  const addItemToCart = useCartStore((state) => state.addItem);
 
   if (lookProducts.length === 0) return null;
 
@@ -39,11 +41,20 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
 
   const handleAddBundle = () => {
     setBundleAdded(true);
-    if (typeof window !== "undefined" && selectedItems.length > 0) {
-      // WooCommerce natively supports adding one item via URL parameter.
-      // We add the first selected item and redirect to cart.
-      window.location.href = `https://springgreen-rook-492819.hostingersite.com/cart/?add-to-cart=${selectedItems[0]}`;
-    }
+    const bundleProducts = [currentProduct, ...lookProducts].filter(p => selectedItems.includes(String(p.id)));
+    
+    bundleProducts.forEach((product) => {
+      addItemToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.images?.[0] || "",
+        quantity: 1,
+        color: "Standard",
+      });
+    });
+    
     setTimeout(() => setBundleAdded(false), 3000);
   };
 

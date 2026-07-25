@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Star, Heart, Share2, ShoppingBag, Zap, ShieldCheck, Truck, RotateCcw, Check, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProductDetail } from "@/lib/data";
+import { useCartStore } from "@/store/cartStore";
 
 interface ProductInfoProps {
   product: ProductDetail;
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
+  const router = useRouter();
   const [liveProduct, setLiveProduct] = useState<ProductDetail>(product);
   const [selectedColor, setSelectedColor] = useState(
     product.colors && product.colors.length > 0 ? product.colors[0].name : "Standard Finish"
@@ -20,6 +23,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const addItemToCart = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     async function fetchLiveSingleProduct() {
@@ -61,16 +65,17 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
   const handleAddToCart = () => {
     setIsAddedToCart(true);
-    showToast(`Redirecting to checkout...`);
     
-    // Redirect to WooCommerce checkout and add item to cart
-    if (typeof window !== "undefined") {
-      // Use liveProduct.id if it's a real WooCommerce ID, otherwise product.id
-      const idToUse = liveProduct.id || product.id;
-      const baseUrl = process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-492819.hostingersite.com";
-      const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
-      window.location.href = `${cleanBaseUrl}/checkout/?add-to-cart=${idToUse}&quantity=${quantity}`;
-    }
+    // Add to local Zustand cart instead of redirecting immediately
+    addItemToCart({
+      id: liveProduct.id || product.id,
+      name: liveProduct.name,
+      price: liveProduct.price,
+      originalPrice: liveProduct.originalPrice,
+      image: product.images?.[0] || "",
+      quantity: quantity,
+      color: selectedColor,
+    });
     
     setTimeout(() => setIsAddedToCart(false), 2500);
   };
@@ -275,7 +280,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <button
         onClick={() => {
           handleAddToCart();
-          showToast("Redirecting to Express Checkout...");
+          router.push("/checkout");
         }}
         className="w-full py-4 px-6 rounded-xl border border-champagne-gold/40 text-champagne-gold hover:bg-champagne-gold/10 font-medium tracking-widest uppercase text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-8"
       >
