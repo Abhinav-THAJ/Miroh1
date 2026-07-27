@@ -245,7 +245,7 @@ export default function CheckoutClient() {
               </div>
               <div className="flex justify-between text-muted-text">
                 <span>Shipping</span>
-                <span className="text-warm-ivory">{shipping === 0 ? "Free" : `₹${shipping}`}</span>
+                <span className="text-warm-ivory">₹{shipping}</span>
               </div>
             </div>
 

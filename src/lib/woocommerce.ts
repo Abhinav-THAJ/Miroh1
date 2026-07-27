@@ -16,6 +16,7 @@ export const REVALIDATE_SECONDS = 60;
 export interface Product {
   id: number;
   name: string;
+  sku?: string;
   price: string;
   regular_price: string;
   sale_price: string;
