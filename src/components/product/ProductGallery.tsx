@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, ShieldCheck, Sparkles, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Maximize2, Sparkles, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ProductGalleryProps {
   images: string[];
@@ -79,9 +79,6 @@ export default function ProductGallery({
               New Drop
             </span>
           )}
-          <span className="px-3 py-1 text-[11px] font-medium tracking-wider uppercase rounded-full bg-primary-bg/80 backdrop-blur-md text-champagne-gold border border-champagne-gold/30 flex items-center gap-1">
-            <ShieldCheck size={12} /> 100% Anti-Tarnish
-          </span>
         </div>
 
         {/* Fullscreen Lightbox Trigger Button */}
