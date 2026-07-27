@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 };
 
 import CartDrawer from "@/components/layout/CartDrawer";
+import Preloader from "@/components/layout/Preloader";
 
 export default function RootLayout({
   children,
@@ -45,6 +46,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+        <Preloader />
         {children}
         <CartDrawer />
       </body>
