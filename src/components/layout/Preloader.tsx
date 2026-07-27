@@ -39,19 +39,18 @@ export default function Preloader() {
               className="absolute w-32 h-32 bg-champagne-gold/20 rounded-full blur-2xl"
             />
             
-            {/* Text Logo */}
+            {/* Logo Image */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative z-10 mb-6 flex flex-col items-center"
+              className="relative z-10 mb-6"
             >
-              <h1 className="text-4xl sm:text-5xl font-serif text-champagne-gold tracking-[0.2em] uppercase">
-                Miorah
-              </h1>
-              <span className="text-xs text-warm-ivory/70 tracking-[0.3em] uppercase mt-2 font-light">
-                The Reflection of Beauty
-              </span>
+              <img
+                src="/logo.png"
+                alt="Miorah Logo"
+                className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-lg"
+              />
             </motion.div>
 
             {/* Loading Bar */}
