@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -40,21 +39,19 @@ export default function Preloader() {
               className="absolute w-32 h-32 bg-champagne-gold/20 rounded-full blur-2xl"
             />
             
-            {/* Logo Image */}
+            {/* Text Logo */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative z-10 mb-6"
+              className="relative z-10 mb-6 flex flex-col items-center"
             >
-              <Image
-                src="/logo.png"
-                alt="Miorah"
-                width={140}
-                height={50}
-                className="h-auto w-auto object-contain brightness-0 invert"
-                priority
-              />
+              <h1 className="text-4xl sm:text-5xl font-serif text-champagne-gold tracking-[0.2em] uppercase">
+                Miorah
+              </h1>
+              <span className="text-xs text-warm-ivory/70 tracking-[0.3em] uppercase mt-2 font-light">
+                The Reflection of Beauty
+              </span>
             </motion.div>
 
             {/* Loading Bar */}
