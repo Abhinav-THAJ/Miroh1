@@ -159,16 +159,17 @@ export default function CollectionsClient({
       .filter((product) => {
         // Category Filter
         if (selectedCategory !== "all") {
-          const matchWcCategory = product.category.toLowerCase() === selectedCategory.toLowerCase();
-          const matchSlug = selectedCategory.toLowerCase().includes(product.category.toLowerCase());
+          const cat = product.category || "";
+          const matchWcCategory = cat.toLowerCase() === selectedCategory.toLowerCase();
+          const matchSlug = selectedCategory.toLowerCase().includes(cat.toLowerCase());
           if (!matchWcCategory && !matchSlug) return false;
         }
         // Search Query Filter
         if (searchQuery.trim() !== "") {
           const query = searchQuery.toLowerCase();
-          const nameMatch = product.name.toLowerCase().includes(query);
-          const catMatch = product.category.toLowerCase().includes(query);
-          const descMatch = product.shortDescription?.toLowerCase().includes(query);
+          const nameMatch = product.name?.toLowerCase().includes(query) || false;
+          const catMatch = product.category?.toLowerCase().includes(query) || false;
+          const descMatch = product.shortDescription?.toLowerCase().includes(query) || false;
           if (!nameMatch && !catMatch && !descMatch) return false;
         }
         return true;
@@ -236,7 +237,7 @@ export default function CollectionsClient({
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-text" size={18} />
             <input
               type="text"
-              placeholder="Search products by name or stone..."
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-luxury-brown border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold"
@@ -374,20 +375,15 @@ export default function CollectionsClient({
                       </Link>
                     </div>
 
-                    {/* Meta info */}
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] uppercase tracking-widest text-champagne-gold font-semibold">
                         {product.category}
                       </span>
-                      <div className="flex items-center gap-1 text-champagne-gold text-xs">
-                        <Star size={12} className="fill-champagne-gold" />
-                        <span>{product.rating}</span>
-                      </div>
                     </div>
 
                     <Link href={`/product/${product.id}`}>
                       <h3 className="font-serif text-lg text-warm-ivory group-hover:text-champagne-gold transition-colors mb-2 line-clamp-1">
-                        {product.name}
+                        {product.name} {product.sku ? <span className="text-xs text-muted-text font-sans font-normal ml-2 tracking-wide uppercase">({product.sku})</span> : null}
                       </h3>
                     </Link>
                   </div>

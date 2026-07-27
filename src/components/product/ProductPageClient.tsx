@@ -7,7 +7,6 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
 import ProductDetailsTabs from "@/components/product/ProductDetailsTabs";
 import CompleteTheLook from "@/components/product/CompleteTheLook";
-import ProductReviews from "@/components/product/ProductReviews";
 import BestSellers from "@/components/home/BestSellers";
 import { getProductById, getProducts } from "@/lib/woocommerce";
 import { ALL_PRODUCTS, MOCK_BEST_SELLERS, ProductDetail } from "@/lib/data";
@@ -117,7 +116,6 @@ export default function ProductPageClient({ productId }: { productId: string }) 
           <CompleteTheLook currentProduct={product} />
 
           {/* Reviews */}
-          <ProductReviews product={product} />
 
           {/* Related Products */}
           <div className="mt-20 border-t border-white/10 pt-16">

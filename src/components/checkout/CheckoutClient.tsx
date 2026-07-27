@@ -22,7 +22,7 @@ export default function CheckoutClient() {
     state: "",
     zip: "",
     country: "IN",
-    payment: "COD"
+    payment: "ONLINE"
   });
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function CheckoutClient() {
 
   const parseNum = (p: string) => Number(p?.replace(/[^0-9.]/g, "") || 0);
   const subtotal = items.reduce((acc, item) => acc + parseNum(item.price) * item.quantity, 0);
-  const shipping = subtotal > 1500 ? 0 : 100; // Free shipping over 1500
+  const shipping = 100; // Flat rate shipping
   const total = subtotal + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -183,10 +183,10 @@ export default function CheckoutClient() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input type="radio" name="payment" defaultChecked className="accent-champagne-gold w-4 h-4" />
-                    <span className="text-warm-ivory font-medium">Cash on Delivery (COD)</span>
+                    <span className="text-warm-ivory font-medium">Online Payment</span>
                   </label>
                 </div>
-                <p className="text-sm text-muted-text ml-7 font-light">Pay in cash upon delivery of your order.</p>
+                <p className="text-sm text-muted-text ml-7 font-light">Pay securely online via credit card, debit card, or UPI.</p>
               </div>
             </section>
 

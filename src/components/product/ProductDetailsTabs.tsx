@@ -10,6 +10,10 @@ interface ProductDetailsTabsProps {
 export default function ProductDetailsTabs({ product }: ProductDetailsTabsProps) {
   // Extract technical specifications
   const specsEntries = Object.entries(product.specs || {});
+  
+  if (specsEntries.length === 0 && (!product.features || product.features.length === 0)) {
+    return null;
+  }
 
   return (
     <div className="mt-20 border-t border-white/10 pt-16">

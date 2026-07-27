@@ -119,22 +119,11 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         {liveProduct.category}
       </span>
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-warm-ivory mb-4 leading-tight">
-        {liveProduct.name}
+        {liveProduct.name} {liveProduct.sku ? <span className="text-xl sm:text-2xl text-muted-text font-sans font-normal ml-3 tracking-wide uppercase">({liveProduct.sku})</span> : null}
       </h1>
 
-      {/* Ratings */}
+      {/* Stock Status */}
       <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-6">
-        <div className="flex items-center gap-1 text-champagne-gold">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={16}
-              className={i < Math.floor(liveProduct.rating) ? "fill-champagne-gold text-champagne-gold" : "text-white/20"}
-            />
-          ))}
-        </div>
-        <span className="text-sm font-medium text-warm-ivory">{liveProduct.rating}</span>
-        <span className="text-sm text-muted-text">({liveProduct.reviewCount} customer reviews)</span>
         <span className={`text-xs font-medium px-2 py-0.5 rounded ${
           liveProduct.inStock 
             ? "text-green-400 bg-green-500/10 border border-green-500/20" 
@@ -288,68 +277,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         Buy Now — Fast Checkout
       </button>
 
-      {/* Pincode / Delivery Estimator */}
-      <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-8">
-        <label className="text-xs uppercase tracking-widest text-warm-ivory/80 font-semibold flex items-center gap-2 mb-3">
-          <MapPin size={16} className="text-champagne-gold" /> Check Delivery & COD Availability
-        </label>
-        <form onSubmit={handleCheckPincode} className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Enter 6-digit Pincode"
-            value={pincode}
-            onChange={(e) => setPincode(e.target.value)}
-            maxLength={6}
-            className="flex-1 bg-luxury-brown border border-white/10 rounded-lg px-4 py-2.5 text-sm text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold"
-          />
-          <button
-            type="submit"
-            className="px-5 py-2.5 rounded-lg bg-champagne-gold/20 text-champagne-gold hover:bg-champagne-gold hover:text-primary-bg text-xs font-semibold uppercase tracking-wider transition-colors"
-          >
-            Check
-          </button>
-        </form>
-        {pincodeStatus && (
-          <p className="text-xs text-champagne-gold mt-3 font-light leading-relaxed">
-            {pincodeStatus}
-          </p>
-        )}
-      </div>
 
-      {/* Trust Highlights Grid */}
-      <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02]">
-          <ShieldCheck className="text-champagne-gold flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h4 className="text-xs font-semibold text-warm-ivory uppercase tracking-wider">Anti-Tarnish</h4>
-            <p className="text-[11px] text-muted-text">Non-fade luster</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02]">
-          <Truck className="text-champagne-gold flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h4 className="text-xs font-semibold text-warm-ivory uppercase tracking-wider">Free Shipping</h4>
-            <p className="text-[11px] text-muted-text">Insured express delivery</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02]">
-          <RotateCcw className="text-champagne-gold flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h4 className="text-xs font-semibold text-warm-ivory uppercase tracking-wider">Replacement</h4>
-            <p className="text-[11px] text-muted-text">Only for damaged/wrong item. Unboxing video required.</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02]">
-          <Zap className="text-champagne-gold flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h4 className="text-xs font-semibold text-warm-ivory uppercase tracking-wider">Skin Safe</h4>
-            <p className="text-[11px] text-muted-text">100% Hypoallergenic</p>
-          </div>
-        </div>
-      </div>
 
     </div>
   );

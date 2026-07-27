@@ -177,21 +177,6 @@ export default function Hero() {
               Celebrate our 1st Anniversary with exclusive offers! Miorah brings you handcrafted luxury imitation jewellery engineered to capture eternal radiance.
             </p>
 
-            {/* Key Luxury Feature Pills */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8 sm:mb-10 text-xs text-warm-ivory/90 font-light">
-              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-champagne-gold/20 bg-luxury-brown/40 backdrop-blur-md">
-                <ShieldCheck className="w-3.5 h-3.5 text-champagne-gold" />
-                <span>100% Anti-Tarnish</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-champagne-gold/20 bg-luxury-brown/40 backdrop-blur-md">
-                <Award className="w-3.5 h-3.5 text-champagne-gold" />
-                <span>Handcrafted Finish</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-champagne-gold/20 bg-luxury-brown/40 backdrop-blur-md">
-                <Star className="w-3.5 h-3.5 text-champagne-gold" />
-                <span>Hypoallergenic</span>
-              </div>
-            </div>
 
             {/* Call to Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6">
@@ -210,18 +195,6 @@ export default function Hero() {
                 Explore New Arrivals
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </div>
-
-            {/* Rating Highlight */}
-            <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-center lg:justify-start gap-4 text-xs text-muted-text">
-              <div className="flex items-center -space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-champagne-gold text-champagne-gold" />
-                ))}
-              </div>
-              <span className="text-warm-ivory font-medium">4.9 / 5.0</span>
-              <span className="text-white/20">•</span>
-              <span>Trusted by 10,000+ Connoisseurs</span>
             </div>
           </motion.div>
 
@@ -338,51 +311,6 @@ export default function Hero() {
 
           </motion.div>
 
-        </div>
-      </div>
-
-      {/* Bottom Hero Trust Highlights Bar */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 mt-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 px-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md">
-          <div className="flex items-center gap-3 text-left">
-            <div className="w-8 h-8 rounded-full bg-champagne-gold/10 border border-champagne-gold/30 flex items-center justify-center text-champagne-gold shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-warm-ivory text-xs font-medium">100% Anti-Tarnish</p>
-              <p className="text-muted-text text-[10px] font-light">Long-lasting luster</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-left">
-            <div className="w-8 h-8 rounded-full bg-champagne-gold/10 border border-champagne-gold/30 flex items-center justify-center text-champagne-gold shrink-0">
-              <Award className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-warm-ivory text-xs font-medium">Handcrafted Finish</p>
-              <p className="text-muted-text text-[10px] font-light">Haute joaillerie quality</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-left">
-            <div className="w-8 h-8 rounded-full bg-champagne-gold/10 border border-champagne-gold/30 flex items-center justify-center text-champagne-gold shrink-0">
-              <Truck className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-warm-ivory text-xs font-medium">Express Delivery</p>
-              <p className="text-muted-text text-[10px] font-light">Shipped in luxury packaging</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-left">
-            <div className="w-8 h-8 rounded-full bg-champagne-gold/10 border border-champagne-gold/30 flex items-center justify-center text-champagne-gold shrink-0">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-warm-ivory text-xs font-medium">Hypoallergenic</p>
-              <p className="text-muted-text text-[10px] font-light">Skin-friendly premium metal</p>
-            </div>
-          </div>
         </div>
       </div>
     </section>

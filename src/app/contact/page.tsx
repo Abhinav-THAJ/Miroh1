@@ -184,7 +184,7 @@ export default function ContactPage() {
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted-text mb-1 font-semibold">Location</p>
                     <p className="text-warm-ivory text-sm leading-relaxed">
-                      EmpireAE<br />Chalakudy, Thrissur<br />Kerala, India
+                      Chalakudy, Thrissur<br />Kerala, India
                     </p>
                   </div>
                 </div>

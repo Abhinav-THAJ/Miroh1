@@ -67,7 +67,7 @@ export default function EditorialShowcase() {
             </Link>
             <div className="mt-8 flex items-center justify-between">
               <div>
-                <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-2 font-semibold">Handcrafted Finish</p>
+
                 <Link href="/collections">
                   <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Royal Green Cascade</h3>
                 </Link>

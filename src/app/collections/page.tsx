@@ -89,7 +89,7 @@ export default function CollectionsPage() {
               Exclusive <span className="italic text-champagne-gold font-light">Collections</span>
             </h1>
             <p className="text-muted-text font-light text-base sm:text-lg leading-relaxed">
-              Discover timeless elegance handcrafted with anti-tarnish protection and hypoallergenic materials.
+              Discover our timeless elegance and exclusive designer jewellery.
             </p>
           </div>
 

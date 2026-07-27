@@ -115,6 +115,7 @@ function transformWcProduct(wc: Product): ProductDetail {
     id: wc.id,
     slug: wc.slug || String(wc.id),
     name: wc.name,
+    sku: wc.sku || "",
     price: fmt(sellingPrice) || "₹850",
     originalPrice: mrp ? fmt(mrp) : undefined,
     category: wc.categories?.length > 0 ? wc.categories[0].name : "Jewellery",
@@ -127,23 +128,8 @@ function transformWcProduct(wc: Product): ProductDetail {
       ? wc.description.replace(/<[^>]*>?/gm, "")
       : "Exquisite artisan jewelry crafted for the modern woman.",
     images,
-    specs: {
-      material: "925 Sterling Silver / High-grade Brass",
-      plating: "High-Grade Finish",
-      stone: "Grade AAA Cubic Zirconia",
-      weight: "4.5 grams",
-      dimensions: "Standard Ergonomic Fit",
-      closure: "Secure Comfort Clasp",
-      waterResistant: "Water & Sweat Resistant",
-      antiTarnish: "100% Anti-Tarnish Coated",
-      hypoallergenic: "Nickel-Free & Skin Safe",
-    },
-    features: [
-      "Water-resistant & sweat-proof design",
-      "Protective anti-tarnish coating",
-      "Ergonomic clasp for day-to-night comfort",
-      "Includes luxury EmpireAE velvet box",
-    ],
+    specs: {},
+    features: [],
     inStock,
   };
 }
