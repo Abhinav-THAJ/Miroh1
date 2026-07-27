@@ -14,17 +14,18 @@ export interface ProductDetail {
   description: string;
   images: string[];
   colors?: { name: string; hex: string; image?: string }[];
-  specs: {
+  specs?: Partial<{
     material: string;
     plating: string;
-    stone?: string;
+    stone: string;
     weight: string;
-    dimensions?: string;
-    closure?: string;
+    dimensions: string;
+    closure: string;
     waterResistant: string;
     antiTarnish: string;
     hypoallergenic: string;
-  };
+    [key: string]: string | undefined;
+  }>;
   features: string[];
   inStock: boolean;
   completeTheLookIds?: (string | number)[];
