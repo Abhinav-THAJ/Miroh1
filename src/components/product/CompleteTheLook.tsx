@@ -125,7 +125,7 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
                       {p.category}
                     </span>
                     <Link
-                      href={`/product/${p.id}`}
+                      href={`/product/${p.slug || p.id}`}
                       className="font-serif text-sm text-warm-ivory hover:text-champagne-gold transition-colors line-clamp-1"
                     >
                       {p.name}

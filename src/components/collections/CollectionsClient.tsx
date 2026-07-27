@@ -319,7 +319,7 @@ export default function CollectionsClient({
                   <div>
                     {/* Image Area */}
                     <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-luxury-brown mb-4">
-                      <Link href={`/product/${product.id}`}>
+                      <Link href={`/product/${product.slug || product.id}`}>
                         <Image
                           src={src1}
                           alt={product.name}
@@ -368,7 +368,7 @@ export default function CollectionsClient({
 
                       {/* Quick View Button overlay */}
                       <Link
-                        href={`/product/${product.id}`}
+                        href={`/product/${product.slug || product.id}`}
                         className="absolute bottom-3 left-3 right-3 py-2.5 rounded-lg bg-primary-bg/90 backdrop-blur-md text-champagne-gold hover:text-white hover:bg-primary-bg text-xs font-semibold uppercase tracking-wider text-center transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 border border-white/10"
                       >
                         View Product <ArrowUpRight size={14} />
@@ -381,7 +381,7 @@ export default function CollectionsClient({
                       </span>
                     </div>
 
-                    <Link href={`/product/${product.id}`}>
+                    <Link href={`/product/${product.slug || product.id}`}>
                       <h3 className="font-serif text-lg text-warm-ivory group-hover:text-champagne-gold transition-colors mb-2 line-clamp-1">
                         {product.name} {product.sku ? <span className="text-xs text-muted-text font-sans font-normal ml-2 tracking-wide uppercase">({product.sku})</span> : null}
                       </h3>

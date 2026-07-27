@@ -7,7 +7,7 @@ export default function ProductIndexPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/product/MI0036/");
+    router.replace("/product/cosmic-bold-huggies/");
   }, [router]);
 
   return (

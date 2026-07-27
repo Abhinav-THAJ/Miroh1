@@ -412,6 +412,7 @@ export function getNewArrivals(): ProductDetail[] {
 
 export const MOCK_BEST_SELLERS = getBestSellers().map((p) => ({
   id: p.id,
+  slug: p.slug,
   name: p.name,
   price: p.price,
   category: p.category,
@@ -421,6 +422,7 @@ export const MOCK_BEST_SELLERS = getBestSellers().map((p) => ({
 
 export const MOCK_NEW_ARRIVALS = getNewArrivals().map((p) => ({
   id: p.id,
+  slug: p.slug,
   name: p.name,
   price: p.price,
   image1: p.images[0],

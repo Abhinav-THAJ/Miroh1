@@ -106,7 +106,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8 }}
             >
-              <Link href={`/product/${displayProducts[0].id}`} className="group relative aspect-[3/4] w-full lg:w-11/12 overflow-hidden rounded-2xl bg-luxury-brown border border-white/5 shadow-2xl block">
+              <Link href={`/product/${displayProducts[0].slug || displayProducts[0].id}`} className="group relative aspect-[3/4] w-full lg:w-11/12 overflow-hidden rounded-2xl bg-luxury-brown border border-white/5 shadow-2xl block">
                 <Image
                   src={getImgSrc(displayProducts[0], 0)}
                   alt={displayProducts[0].name}
@@ -119,7 +119,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
               
               <div className="mt-8 lg:w-11/12 flex items-center justify-between">
                 <div>
-                  <Link href={`/product/${displayProducts[0].id}`}>
+                  <Link href={`/product/${displayProducts[0].slug || displayProducts[0].id}`}>
                     <h3 className="text-3xl font-serif text-warm-ivory hover:text-champagne-gold transition-colors mb-2">
                       {displayProducts[0].name}
                     </h3>
@@ -132,7 +132,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                   </div>
                 </div>
                 <Link
-                  href={`/product/${displayProducts[0].id}`}
+                  href={`/product/${displayProducts[0].slug || displayProducts[0].id}`}
                   className="w-12 h-12 rounded-full border border-champagne-gold/30 flex items-center justify-center text-champagne-gold hover:bg-champagne-gold hover:text-primary-bg transition-colors"
                 >
                   <ArrowUpRight className="w-5 h-5" />
@@ -153,7 +153,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <Link href={`/product/${displayProducts[1].id}`} className="group relative aspect-square w-full overflow-hidden rounded-full bg-luxury-brown border border-champagne-gold/20 shadow-xl block">
+                <Link href={`/product/${displayProducts[1].slug || displayProducts[1].id}`} className="group relative aspect-square w-full overflow-hidden rounded-full bg-luxury-brown border border-champagne-gold/20 shadow-xl block">
                   <Image
                     src={getImgSrc(displayProducts[1], 1)}
                     alt={displayProducts[1].name}
@@ -163,7 +163,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                   />
                 </Link>
                 <div className="mt-8 text-right pr-6">
-                  <Link href={`/product/${displayProducts[1].id}`}>
+                  <Link href={`/product/${displayProducts[1].slug || displayProducts[1].id}`}>
                     <h3 className="text-2xl font-serif text-warm-ivory hover:text-champagne-gold transition-colors mb-1">
                       {displayProducts[1].name}
                     </h3>
@@ -187,7 +187,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <Link href={`/product/${displayProducts[2].id}`} className="group relative aspect-[4/5] w-full sm:w-1/2 overflow-hidden rounded-2xl bg-luxury-brown border border-white/5 shadow-2xl block">
+                <Link href={`/product/${displayProducts[2].slug || displayProducts[2].id}`} className="group relative aspect-[4/5] w-full sm:w-1/2 overflow-hidden rounded-2xl bg-luxury-brown border border-white/5 shadow-2xl block">
                   <Image
                     src={getImgSrc(displayProducts[2], 2)}
                     alt={displayProducts[2].name}
@@ -197,7 +197,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                   />
                 </Link>
                 <div className="w-full sm:w-1/2 text-center sm:text-right">
-                  <Link href={`/product/${displayProducts[2].id}`}>
+                  <Link href={`/product/${displayProducts[2].slug || displayProducts[2].id}`}>
                     <h3 className="text-2xl font-serif text-warm-ivory hover:text-champagne-gold transition-colors mb-2">
                       {displayProducts[2].name}
                     </h3>
@@ -209,7 +209,7 @@ export default function NewArrivals({ products }: { products?: ProductProp[] }) 
                     <p className="text-champagne-gold font-light tracking-widest">{displayProducts[2].price}</p>
                   </div>
                   <Link
-                    href={`/product/${displayProducts[2].id}`}
+                    href={`/product/${displayProducts[2].slug || displayProducts[2].id}`}
                     className="inline-block text-xs uppercase tracking-widest text-muted-text hover:text-champagne-gold border-b border-white/10 hover:border-champagne-gold pb-1 transition-colors"
                   >
                     View Product

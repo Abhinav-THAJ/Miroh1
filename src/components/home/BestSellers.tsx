@@ -96,7 +96,7 @@ export default function BestSellers({ products }: { products: ProductProp[] }) {
                 >
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4 transition-all duration-300 hover:border-champagne-gold/30 flex flex-col justify-between h-full">
                     <div>
-                      <Link href={`/product/${product.id}`} className="block relative aspect-square w-full rounded-lg overflow-hidden bg-luxury-brown mb-6">
+                      <Link href={`/product/${product.slug || product.id}`} className="block relative aspect-square w-full rounded-lg overflow-hidden bg-luxury-brown mb-6">
                         {/* Primary Image */}
                         <Image
                           src={src1}
@@ -132,7 +132,7 @@ export default function BestSellers({ products }: { products: ProductProp[] }) {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] uppercase tracking-widest text-champagne-gold mb-1">{product.category}</p>
-                          <Link href={`/product/${product.id}`}>
+                          <Link href={`/product/${product.slug || product.id}`}>
                             <h3 className="font-serif text-lg text-warm-ivory hover:text-champagne-gold transition-colors">{product.name}</h3>
                           </Link>
                         </div>
@@ -149,7 +149,7 @@ export default function BestSellers({ products }: { products: ProductProp[] }) {
                         <span className="text-xl font-bold text-warm-ivory">{product.price}</span>
                       </div>
                       <Link
-                        href={`/product/${product.id}`}
+                        href={`/product/${product.slug || product.id}`}
                         className="text-xs uppercase tracking-widest text-champagne-gold hover:text-white transition-colors flex items-center gap-2"
                       >
                         <ShoppingBag size={14} /> View

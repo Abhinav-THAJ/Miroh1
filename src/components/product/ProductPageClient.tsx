@@ -38,6 +38,7 @@ export default function ProductPageClient({ productId }: { productId: string }) 
           const price = p.sale_price || p.price;
           return {
             id: p.id,
+            slug: p.slug || String(p.id),
             name: p.name,
             price: fmt(price) || "₹850",
             originalPrice: p.regular_price ? fmt(p.regular_price) : undefined,

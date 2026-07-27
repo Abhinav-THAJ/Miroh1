@@ -15,7 +15,7 @@ const HERO_SLIDES = [
     subtitle: "Handcrafted Antique Gold Finish with Precious Kundan Work",
     price: "₹3,400",
     image: "/images/products/MI0035/MI0035-1.png",
-    link: "/product/MI0035",
+    link: "/product/kundan-choker-set",
     badge: "Bestseller",
   },
   {
@@ -25,7 +25,7 @@ const HERO_SLIDES = [
     subtitle: "Statement Choker & Drop Earrings",
     price: "₹2,850",
     image: "/images/products/MI0012/MI0012-1 Green.png",
-    link: "/product/MI0012",
+    link: "/product/emerald-ruby-heritage",
     badge: "New Arrival",
   },
   {
@@ -45,7 +45,7 @@ const HERO_SLIDES = [
     subtitle: "Show-Stopping Statement Suite Crafted for Unforgettable Moments",
     price: "₹4,950",
     image: "/images/products/MI0029/MI0029-1.png",
-    link: "/product/MI0029",
+    link: "/product/kundan-pearl-bridal-suite",
     badge: "Limited Edition",
   },
 ];

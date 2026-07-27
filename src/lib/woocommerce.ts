@@ -69,6 +69,9 @@ export async function getProductById(id: string | number): Promise<ProductDetail
   if (isNum) {
     const data = await wcFetch<Product>(`products/${id}`);
     if (data?.id) return transformWcProduct(data);
+  } else {
+    const data = await wcFetch<Product[]>(`products`, { slug: String(id) });
+    if (data && data.length > 0) return transformWcProduct(data[0]);
   }
   // Fallback to local mock data if WC fails
   return getMockProductById(id) || getMockProductById("MI0036")!;
