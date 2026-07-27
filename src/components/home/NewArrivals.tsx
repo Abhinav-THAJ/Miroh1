@@ -8,6 +8,7 @@ import { ArrowUpRight } from "lucide-react";
 
 interface ProductProp {
   id: number | string;
+  slug?: string;
   name: string;
   price: string;
   originalPrice?: string;

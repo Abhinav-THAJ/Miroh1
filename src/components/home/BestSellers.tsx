@@ -9,6 +9,7 @@ import useEmblaCarousel from "embla-carousel-react";
 
 interface ProductProp {
   id: number | string;
+  slug?: string;
   name: string;
   price: string;
   category: string;
