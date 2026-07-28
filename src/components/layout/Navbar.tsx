@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Search, Heart, ShoppingBag, User, Menu, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { ALL_PRODUCTS } from "@/lib/data";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -29,6 +30,14 @@ export default function Navbar() {
   
   // Calculate total quantity of items in cart
   const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const searchResults = searchQuery.trim() === "" 
+    ? [] 
+    : ALL_PRODUCTS.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 4);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,24 +75,72 @@ export default function Navbar() {
               exit={{ opacity: 0, y: -10 }}
               className="absolute inset-0 bg-primary-bg/95 backdrop-blur-md z-[60] flex items-center px-6"
             >
-              <form onSubmit={handleSearchSubmit} className="w-full max-w-4xl mx-auto flex items-center gap-4">
-                <Search size={20} className="text-champagne-gold" />
-                <input
-                  type="text"
-                  placeholder="Search collections, pieces, styles..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none text-warm-ivory placeholder:text-muted-text/50 font-light text-lg"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(false)}
-                  className="text-muted-text hover:text-champagne-gold transition-colors p-2"
-                >
-                  <X size={24} />
-                </button>
-              </form>
+              <div className="w-full max-w-4xl mx-auto flex flex-col relative">
+                <form onSubmit={handleSearchSubmit} className="flex items-center gap-4">
+                  <Search size={20} className="text-champagne-gold" />
+                  <input
+                    type="text"
+                    placeholder="Search collections, pieces, styles..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 bg-transparent border-none outline-none text-warm-ivory placeholder:text-muted-text/50 font-light text-lg"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                    className="text-muted-text hover:text-champagne-gold transition-colors p-2"
+                  >
+                    <X size={24} />
+                  </button>
+                </form>
+
+                {/* Live Search Results */}
+                {searchQuery.trim() !== "" && (
+                  <div className="absolute top-full left-0 w-full mt-6 bg-luxury-brown/95 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-[70vh] overflow-y-auto scrollbar-none">
+                    {searchResults.length > 0 ? (
+                      <div>
+                        <div className="px-5 py-3 bg-white/5 border-b border-white/10 text-[10px] uppercase tracking-widest text-champagne-gold font-bold">
+                          Matching Pieces
+                        </div>
+                        {searchResults.map(product => (
+                          <Link 
+                            key={product.id} 
+                            href={`/product/${product.slug || product.id}`}
+                            onClick={() => {
+                               setSearchOpen(false);
+                               setSearchQuery("");
+                            }}
+                            className="flex items-center gap-4 p-4 hover:bg-white/5 border-b border-white/5 transition-colors group"
+                          >
+                            <div className="relative w-16 h-16 rounded-md overflow-hidden bg-primary-bg">
+                              <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                            </div>
+                            <div>
+                               <p className="text-[10px] text-muted-text uppercase tracking-wider mb-1">{product.category}</p>
+                               <h4 className="text-warm-ivory text-sm sm:text-base font-serif group-hover:text-champagne-gold transition-colors line-clamp-1">{product.name}</h4>
+                               <p className="text-xs text-champagne-gold font-semibold mt-1">{product.price}</p>
+                            </div>
+                          </Link>
+                        ))}
+                        <button 
+                          onClick={handleSearchSubmit}
+                          className="w-full text-center py-4 text-xs uppercase tracking-widest text-champagne-gold hover:bg-white/5 transition-colors font-semibold"
+                        >
+                          View all results &rarr;
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-muted-text font-light text-sm">
+                        No pieces found matching "<span className="text-warm-ivory">{searchQuery}</span>"
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
