@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingBag, SlidersHorizontal, Search, ArrowUpRight, Check, Star, RefreshCw } from "lucide-react";
 import { ProductDetail, Category } from "@/lib/data";
@@ -21,7 +22,8 @@ export default function CollectionsClient({
 }: CollectionsClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "newest">("featured");
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [addedCartId, setAddedCartId] = useState<string | number | null>(null);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
@@ -41,6 +43,13 @@ export default function CollectionsClient({
     "/images/products/MI0037/MI0037-1.png",
     "/images/products/MI0010/MI0010-1.png",
   ];
+
+  useEffect(() => {
+    const q = searchParams.get("search");
+    if (q !== null) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   // Real-time client-side sync from Hostinger WooCommerce REST API
   useEffect(() => {
@@ -292,7 +301,7 @@ export default function CollectionsClient({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           <AnimatePresence mode="popLayout">
             {filteredProducts.map((product, index) => {
               const strId = String(product.id);
@@ -314,11 +323,11 @@ export default function CollectionsClient({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="group bg-white/5 border border-white/10 hover:border-champagne-gold/40 rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between"
+                  className="group bg-white/5 border border-white/10 hover:border-champagne-gold/40 rounded-2xl p-3 sm:p-4 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
                     {/* Image Area */}
-                    <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-luxury-brown mb-4">
+                    <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-luxury-brown mb-3 sm:mb-4">
                       <Link href={`/product/${product.slug || product.id}`}>
                         <Image
                           src={src1}
@@ -382,8 +391,8 @@ export default function CollectionsClient({
                     </div>
 
                     <Link href={`/product/${product.slug || product.id}`}>
-                      <h3 className="font-serif text-lg text-warm-ivory group-hover:text-champagne-gold transition-colors mb-2 line-clamp-1">
-                        {product.name} {product.sku ? <span className="text-xs text-muted-text font-sans font-normal ml-2 tracking-wide uppercase">({product.sku})</span> : null}
+                      <h3 className="font-serif text-sm sm:text-lg text-warm-ivory group-hover:text-champagne-gold transition-colors mb-2 line-clamp-2 sm:line-clamp-1">
+                        {product.name} {product.sku ? <span className="text-[10px] sm:text-xs text-muted-text font-sans font-normal ml-1 sm:ml-2 tracking-wide uppercase">({product.sku})</span> : null}
                       </h3>
                     </Link>
                   </div>
@@ -396,7 +405,7 @@ export default function CollectionsClient({
                           {product.originalPrice}
                         </span>
                       )}
-                      <span className="text-xl font-bold text-warm-ivory">
+                      <span className="text-base sm:text-xl font-bold text-warm-ivory">
                         {product.price}
                       </span>
                     </div>

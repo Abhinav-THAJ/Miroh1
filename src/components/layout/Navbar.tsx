@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Search, Heart, ShoppingBag, User, Menu, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
@@ -19,11 +20,24 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
   const { scrollY } = useScroll();
   const { toggleCart, items } = useCartStore();
   
   // Calculate total quantity of items in cart
   const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchOpen(false);
+      router.push(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
@@ -33,7 +47,7 @@ export default function Navbar() {
     <>
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
-        isScrolled
+        isScrolled || searchOpen
           ? "bg-primary-bg/80 backdrop-blur-md border-b border-white/5 py-3 shadow-sm"
           : "bg-transparent py-5"
       }`}
@@ -41,8 +55,39 @@ export default function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="container mx-auto px-6 flex items-center justify-between relative">
         
+        {/* Search Overlay */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute inset-0 bg-primary-bg/95 backdrop-blur-md z-[60] flex items-center px-6"
+            >
+              <form onSubmit={handleSearchSubmit} className="w-full max-w-4xl mx-auto flex items-center gap-4">
+                <Search size={20} className="text-champagne-gold" />
+                <input
+                  type="text"
+                  placeholder="Search collections, pieces, styles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-transparent border-none outline-none text-warm-ivory placeholder:text-muted-text/50 font-light text-lg"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="text-muted-text hover:text-champagne-gold transition-colors p-2"
+                >
+                  <X size={24} />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Mobile Menu Toggle */}
         <button
           className="lg:hidden text-warm-ivory hover:text-champagne-gold transition-colors"
@@ -132,7 +177,10 @@ export default function Navbar() {
 
         {/* Icons */}
         <div className="flex items-center space-x-5 text-warm-ivory">
-          <button className="hover:text-champagne-gold transition-colors">
+          <button 
+            onClick={() => setSearchOpen(true)}
+            className="hover:text-champagne-gold transition-colors"
+          >
             <Search size={20} strokeWidth={1.5} />
           </button>
           <Link href="/wishlist" className="hover:text-champagne-gold transition-colors hidden sm:block">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Image from "next/image";
@@ -8,13 +8,26 @@ import Link from "next/link";
 import { Heart, ShoppingBag, Trash2, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ALL_PRODUCTS } from "@/lib/data";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 export default function WishlistPage() {
-  const [wishlistItems, setWishlistItems] = useState(ALL_PRODUCTS.slice(0, 4));
+  const [mounted, setMounted] = useState(false);
+  const wishlistItems = useWishlistStore((state) => state.items);
+  const removeItem = useWishlistStore((state) => state.removeItem);
 
-  const removeItem = (id: string | number) => {
-    setWishlistItems(wishlistItems.filter((item) => item.id !== id));
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <main className="flex-1 w-full pt-32 pb-24 flex items-center justify-center" />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col selection:bg-champagne-gold selection:text-luxury-black">

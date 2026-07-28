@@ -6,6 +6,7 @@ import { Star, Heart, Share2, ShoppingBag, Zap, ShieldCheck, Truck, RotateCcw, C
 import { motion, AnimatePresence } from "framer-motion";
 import { ProductDetail } from "@/lib/data";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 interface ProductInfoProps {
   product: ProductDetail;
@@ -24,6 +25,11 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const addItemToCart = useCartStore((state) => state.addItem);
+  const { items: wishlistItems, addItem: addWishlistItem, removeItem: removeWishlistItem } = useWishlistStore();
+
+  useEffect(() => {
+    setIsWishlisted(wishlistItems.some((item) => item.id === (liveProduct.id || product.id)));
+  }, [wishlistItems, liveProduct.id, product.id]);
 
   useEffect(() => {
     async function fetchLiveSingleProduct() {
@@ -209,7 +215,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         
         {/* Quantity Selector */}
-        <div className="flex items-center justify-between border border-white/15 rounded-xl px-4 py-3 bg-white/5 w-full sm:w-36">
+        <div className={`flex items-center justify-between border border-white/15 rounded-xl px-4 py-3 bg-white/5 w-full sm:w-36 ${!liveProduct.inStock ? 'opacity-50 pointer-events-none' : ''}`}>
           <button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             className="text-warm-ivory hover:text-champagne-gold text-lg px-2"
@@ -228,22 +234,38 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
+          disabled={!liveProduct.inStock}
           className={`flex-1 py-4 px-6 rounded-xl font-medium tracking-widest uppercase text-xs transition-all duration-300 flex items-center justify-center gap-3 shadow-lg ${
-            isAddedToCart
+            !liveProduct.inStock
+              ? "bg-white/10 text-white/40 cursor-not-allowed"
+              : isAddedToCart
               ? "bg-green-600 text-white"
               : "bg-champagne-gold text-primary-bg hover:bg-white hover:text-luxury-black"
           }`}
         >
           <ShoppingBag size={18} />
-          {isAddedToCart ? "Added to Cart!" : "Add to Shopping Bag"}
+          {!liveProduct.inStock ? "Out of Stock" : isAddedToCart ? "Added to Cart!" : "Add to Shopping Bag"}
         </button>
 
         {/* Wishlist & Share Buttons */}
         <div className="flex gap-2">
           <button
             onClick={() => {
-              setIsWishlisted(!isWishlisted);
-              showToast(isWishlisted ? "Removed from Wishlist" : "Saved to Wishlist!");
+              const currentId = liveProduct.id || product.id;
+              if (isWishlisted) {
+                removeWishlistItem(currentId);
+                showToast("Removed from Wishlist");
+              } else {
+                addWishlistItem({
+                  id: currentId,
+                  slug: product.slug,
+                  name: liveProduct.name,
+                  price: liveProduct.price,
+                  category: liveProduct.category || "Uncategorized",
+                  images: product.images,
+                });
+                showToast("Saved to Wishlist!");
+              }
             }}
             className={`w-14 h-14 rounded-xl border flex items-center justify-center transition-all ${
               isWishlisted
@@ -271,7 +293,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           handleAddToCart();
           router.push("/checkout");
         }}
-        className="w-full py-4 px-6 rounded-xl border border-champagne-gold/40 text-champagne-gold hover:bg-champagne-gold/10 font-medium tracking-widest uppercase text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-8"
+        disabled={!liveProduct.inStock}
+        className={`w-full py-4 px-6 rounded-xl border text-champagne-gold font-medium tracking-widest uppercase text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-8 ${
+          !liveProduct.inStock
+            ? "border-white/10 text-white/40 opacity-50 cursor-not-allowed"
+            : "border-champagne-gold/40 hover:bg-champagne-gold/10"
+        }`}
       >
         <Zap size={16} />
         Buy Now — Fast Checkout

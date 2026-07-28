@@ -24,7 +24,7 @@ export default function EditorialShowcase() {
       <div className="container mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 border-b border-white/10 pb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 border-b border-white/10 pb-12">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -125,7 +125,7 @@ export default function EditorialShowcase() {
                   className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 />
               </Link>
-              <div className="absolute -bottom-10 -left-10 lg:-left-20 bg-primary-bg p-8 rounded-tr-3xl border-t border-r border-white/5 shadow-2xl max-w-[80%]">
+              <div className="absolute -bottom-10 left-0 sm:-left-10 lg:-left-20 bg-primary-bg p-8 rounded-tr-3xl border-t border-r border-white/5 shadow-2xl max-w-[80%]">
                 <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-2 font-semibold">Heritage Collection</p>
                 <Link href="/collections">
                   <h3 className="font-serif text-2xl lg:text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Traditional Coin Necklace</h3>

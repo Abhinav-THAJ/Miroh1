@@ -15,13 +15,6 @@ const collections = [
     description: "Embrace the timeless elegance of classic designs, meticulously crafted to honor cultural heritage.",
   },
   {
-    id: "anti-tarnish",
-    title: "Anti Tarnish",
-    subtitle: "EVERYDAY LUXURY",
-    image: "/images/products/MI0026/MI0026-1.png",
-    description: "Flawless beauty that endures. Discover pieces engineered to maintain their pristine shine forever.",
-  },
-  {
     id: "bridal",
     title: "Bridal",
     subtitle: "THE BIG DAY",

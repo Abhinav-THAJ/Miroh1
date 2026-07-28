@@ -78,23 +78,27 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           
           {/* Bundle Items Cards */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 items-stretch sm:items-center">
             
             {/* Main Item */}
-            <div className="relative p-4 rounded-xl bg-luxury-brown/50 border border-champagne-gold/30">
-              <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-3">
-                <Image
-                  src={currentProduct.images[0]}
-                  alt={currentProduct.name}
-                  fill
-                  className="object-cover"
-                />
+            <div className="relative p-3 sm:p-4 rounded-xl bg-luxury-brown/50 border border-champagne-gold/30 flex flex-col justify-between h-full">
+              <div>
+                <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-3">
+                  <Image
+                    src={currentProduct.images[0]}
+                    alt={currentProduct.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-champagne-gold block mb-1">
-                Main Piece
-              </span>
-              <h4 className="font-serif text-sm text-warm-ivory line-clamp-1">{currentProduct.name}</h4>
-              <p className="text-xs text-champagne-gold mt-1 font-semibold">{currentProduct.price}</p>
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-champagne-gold block mb-1 mt-auto">
+                  Main Piece
+                </span>
+                <h4 className="font-serif text-sm text-warm-ivory line-clamp-2 sm:line-clamp-1">{currentProduct.name}</h4>
+                <p className="text-xs text-champagne-gold mt-1 font-semibold">{currentProduct.price}</p>
+              </div>
             </div>
 
             {/* Look Products */}
@@ -102,16 +106,17 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
               const pId = String(p.id);
               const isSelected = selectedItems.includes(pId);
               return (
-                <div key={p.id} className="relative">
+                <div key={p.id} className="relative h-full">
                   <div
                     onClick={() => toggleItem(pId)}
-                    className={`cursor-pointer p-4 rounded-xl border transition-all ${
+                    className={`cursor-pointer p-3 sm:p-4 rounded-xl border transition-all h-full flex flex-col justify-between ${
                       isSelected
                         ? "bg-luxury-brown/50 border-champagne-gold"
                         : "bg-white/[0.02] border-white/10 opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-3">
+                    <div>
+                      <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-3">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
                       <button
                         className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors ${
@@ -121,16 +126,19 @@ export default function CompleteTheLook({ currentProduct }: CompleteTheLookProps
                         {isSelected ? <Check size={14} /> : <Plus size={14} />}
                       </button>
                     </div>
-                    <span className="text-[10px] uppercase tracking-widest text-muted-text block mb-1">
-                      {p.category}
-                    </span>
-                    <Link
-                      href={`/product/${p.slug || p.id}`}
-                      className="font-serif text-sm text-warm-ivory hover:text-champagne-gold transition-colors line-clamp-1"
-                    >
-                      {p.name}
-                    </Link>
-                    <p className="text-xs text-champagne-gold mt-1 font-semibold">{p.price}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-widest text-muted-text block mb-1 mt-auto">
+                        {p.category}
+                      </span>
+                      <Link
+                        href={`/product/${p.slug || p.id}`}
+                        className="font-serif text-sm text-warm-ivory hover:text-champagne-gold transition-colors line-clamp-2 sm:line-clamp-1"
+                      >
+                        {p.name}
+                      </Link>
+                      <p className="text-xs text-champagne-gold mt-1 font-semibold">{p.price}</p>
+                    </div>
                   </div>
                 </div>
               );

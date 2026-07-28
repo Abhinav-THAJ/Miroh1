@@ -97,7 +97,7 @@ export default function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-[90vh] lg:min-h-screen w-full overflow-hidden bg-primary-bg flex flex-col justify-between pt-24 lg:pt-28 pb-8 lg:pb-12"
+      className="relative min-h-[100svh] lg:min-h-screen w-full overflow-hidden bg-primary-bg flex flex-col justify-between pt-20 sm:pt-24 lg:pt-28 pb-8 lg:pb-12"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
@@ -157,12 +157,12 @@ export default function Hero() {
               <div className="absolute inset-0 bg-champagne-gold/30 blur-[20px] rounded-full animate-pulse duration-[3000ms]" />
               
               {/* Content */}
-              <div className="relative flex items-center gap-3 px-6 py-2.5 rounded-full border border-champagne-gold/50 bg-luxury-brown/80 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                <Sparkles className="w-4 h-4 text-champagne-gold animate-pulse" />
-                <span className="text-champagne-gold font-bold uppercase tracking-[0.3em] text-[10px] sm:text-xs drop-shadow-sm">
+              <div className="relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-champagne-gold/50 bg-luxury-brown/80 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
+                <span className="text-champagne-gold font-bold uppercase tracking-[0.15em] sm:tracking-[0.3em] text-[9px] sm:text-xs drop-shadow-sm text-center whitespace-nowrap">
                   1-Year Anniversary <span className="text-white">Offer</span>
                 </span>
-                <Sparkles className="w-4 h-4 text-champagne-gold animate-pulse" />
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
               </div>
             </motion.div>
             
@@ -210,7 +210,7 @@ export default function Hero() {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-champagne-gold/20 via-transparent to-rose-gold/20 blur-xl opacity-70 pointer-events-none transform scale-95" />
 
             {/* Main Showcase Container */}
-            <div className="relative w-full max-w-[460px] aspect-[4/5] rounded-2xl overflow-hidden bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group">
+            <div className="relative w-full max-w-[340px] sm:max-w-[460px] mx-auto aspect-[4/5] rounded-2xl overflow-hidden bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group">
               
               {/* Animated Slide Image Switcher */}
               <AnimatePresence mode="wait">
@@ -222,7 +222,7 @@ export default function Hero() {
                   transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                   className="w-full h-full relative"
                 >
-                  <div className="block w-full h-full relative">
+                  <Link href={activeSlide.link} className="block w-full h-full relative">
                     <Image
                       src={activeSlide.image}
                       alt={activeSlide.title}
@@ -260,7 +260,7 @@ export default function Hero() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </motion.div>
               </AnimatePresence>
 
