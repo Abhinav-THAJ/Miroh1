@@ -62,7 +62,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 text-muted-text text-sm font-light">
-          <p>&copy; {new Date().getFullYear()} empireae. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Miorah. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="https://www.instagram.com/miorah_.in" target="_blank" rel="noreferrer" className="hover:text-champagne-gold transition-colors">Instagram</a>
             <a href="https://wa.me/918078894696" target="_blank" rel="noreferrer" className="hover:text-champagne-gold transition-colors">WhatsApp</a>
