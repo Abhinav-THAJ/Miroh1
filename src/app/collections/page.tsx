@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CollectionsClient from "@/components/collections/CollectionsClient";
@@ -93,7 +93,9 @@ export default function CollectionsPage() {
             </p>
           </div>
 
-          <CollectionsClient initialProducts={products} categories={categories} />
+          <Suspense fallback={<div className="py-20 text-center text-warm-ivory">Loading collections...</div>}>
+            <CollectionsClient initialProducts={products} categories={categories} />
+          </Suspense>
         </div>
       </main>
 
