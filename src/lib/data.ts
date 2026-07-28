@@ -385,6 +385,51 @@ export const ALL_PRODUCTS: ProductDetail[] = [
     inStock: true,
     completeTheLookIds: ["MI0036", "MI0030"],
   },
+  {
+    id: "MI0012",
+    slug: "emerald-ruby-heritage",
+    name: "Royal Green Cascade",
+    price: "₹2,850",
+    originalPrice: "₹3,500",
+    category: "Chokers",
+    isNewArrival: true,
+    rating: 4.8,
+    reviewCount: 24,
+    shortDescription: "Statement Choker & Drop Earrings",
+    description: "Handpicked Designer Jewellery featuring a Royal Green Cascade. A true statement choker with matching drop earrings.",
+    images: [
+      "/images/products/MI0012/MI0012-1 Green.png"
+    ],
+    features: [
+      "Royal Essence Collection",
+      "Statement design",
+      "Matching drop earrings included"
+    ],
+    inStock: true,
+  },
+
+  {
+    id: "MI0029",
+    slug: "kundan-pearl-bridal-suite",
+    name: "Imperial Bridal Suite",
+    price: "₹4,950",
+    originalPrice: "₹6,000",
+    category: "Bridal Sets",
+    isNewArrival: false,
+    rating: 5.0,
+    reviewCount: 18,
+    shortDescription: "Show-Stopping Statement Suite Crafted for Unforgettable Moments",
+    description: "The ultimate bridal statement. This Imperial Bridal Suite features layers of Kundan and Pearls for an unforgettable look on your special day.",
+    images: [
+      "/images/products/MI0029/MI0029-1.png"
+    ],
+    features: [
+      "Bridal Luxury Collection",
+      "Show-Stopping Statement Suite",
+      "Kundan and Pearl Accents"
+    ],
+    inStock: true,
+  },
 ];
 
 // Fallback Helper Functions

@@ -48,7 +48,7 @@ export default function Footer() {
               <li>Chalakudy, Thrissur</li>
               <li>Kerala, India</li>
               <li>
-                <a href="mailto:miorah.thereflectionofbeauty@gmail.com" className="hover:text-champagne-gold transition-colors inline-block text-left">
+                <a href="mailto:miorah.thereflectionofbeauty@gmail.com" className="hover:text-champagne-gold transition-colors inline-block text-left break-all">
                   miorah.thereflectionofbeauty@gmail.com
                 </a>
               </li>

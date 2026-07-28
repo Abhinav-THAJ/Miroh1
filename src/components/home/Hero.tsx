@@ -210,7 +210,7 @@ export default function Hero() {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-champagne-gold/20 via-transparent to-rose-gold/20 blur-xl opacity-70 pointer-events-none transform scale-95" />
 
             {/* Main Showcase Container */}
-            <div className="relative w-full max-w-[460px] aspect-[4/5] rounded-2xl overflow-hidden border border-champagne-gold/25 bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group">
+            <div className="relative w-full max-w-[460px] aspect-[4/5] rounded-2xl overflow-hidden bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group">
               
               {/* Animated Slide Image Switcher */}
               <AnimatePresence mode="wait">
@@ -222,7 +222,7 @@ export default function Hero() {
                   transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                   className="w-full h-full relative"
                 >
-                  <Link href={activeSlide.link} className="block w-full h-full relative">
+                  <div className="block w-full h-full relative">
                     <Image
                       src={activeSlide.image}
                       alt={activeSlide.title}
@@ -253,17 +253,14 @@ export default function Hero() {
                           </p>
                         </div>
                         
-                        <div className="text-right pl-3 flex flex-col items-end">
+                        <div className="text-right pl-3 flex flex-col items-end justify-center">
                           <span className="text-warm-ivory font-serif text-lg sm:text-xl font-semibold text-champagne-gold">
                             {activeSlide.price}
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-warm-ivory/80 group-hover:text-champagne-gold transition-colors mt-1">
-                            View <ArrowUpRight className="w-3 h-3" />
                           </span>
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </motion.div>
               </AnimatePresence>
 

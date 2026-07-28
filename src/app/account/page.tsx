@@ -108,9 +108,9 @@ function AuthPanel({ onSuccess }: { onSuccess: () => void }) {
               </h1>
               <p className="text-sm text-muted-text mt-2 font-light">
                 {view === "login"
-                  ? "Sign in to your EmpireAE account"
+                  ? "Sign in to your Miorah account"
                   : view === "register"
-                  ? "Join EmpireAE and unlock exclusive benefits"
+                  ? "Join Miorah and unlock exclusive benefits"
                   : "We'll send a reset link to your email"}
               </p>
             </div>

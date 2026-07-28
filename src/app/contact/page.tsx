@@ -198,7 +198,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted-text mb-1 font-semibold">WhatsApp</p>
-                    <a href="https://wa.me/918078894696?text=Hi%20EmpireAE%2C%20I%20would%20like%20to%20know%20more%20about%20your%20jewellery" target="_blank" rel="noreferrer" className="text-warm-ivory hover:text-champagne-gold transition-colors text-sm">
+                    <a href="https://wa.me/918078894696?text=Hi%20miorah%2C%20I%20would%20like%20to%20know%20more%20about%20your%20jewellery" target="_blank" rel="noreferrer" className="text-warm-ivory hover:text-champagne-gold transition-colors text-sm">
                       +91 80788 94696
                     </a>
                   </div>
@@ -207,7 +207,7 @@ export default function ContactPage() {
 
               {/* WhatsApp CTA */}
               <a
-                href="https://wa.me/918078894696?text=Hi%20EmpireAE%2C%20I%20would%20like%20to%20know%20more%20about%20your%20jewellery"
+                href="https://wa.me/918078894696?text=Hi%20miorah%2C%20I%20would%20like%20to%20know%20more%20about%20your%20jewellery"
                 target="_blank" rel="noreferrer"
                 className="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-500 text-white py-4 px-6 rounded-2xl font-medium text-sm tracking-wide transition-all shadow-lg"
               >

@@ -46,9 +46,11 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
-        <Preloader />
-        {children}
-        <CartDrawer />
+        <div className="flex flex-col min-h-screen w-full overflow-x-hidden relative">
+          <Preloader />
+          {children}
+          <CartDrawer />
+        </div>
       </body>
     </html>
   );

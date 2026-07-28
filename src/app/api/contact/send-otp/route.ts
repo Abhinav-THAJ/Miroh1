@@ -31,13 +31,13 @@ async function sendOtpViaWordPress(email: string, otp: string): Promise<boolean>
     const body = {
       title: `OTP: ${otp} for ${email}`,
       content: `
-        <h2>Your EmpireAE Verification Code</h2>
+        <h2>Your Miorah Verification Code</h2>
         <p>Your 6-digit verification code is:</p>
         <h1 style="letter-spacing:0.3em; color:#C9A96E;">${otp}</h1>
         <p>This code expires in 10 minutes.</p>
         <p>If you did not request this, please ignore this email.</p>
         <br/>
-        <p><em>— EmpireAE Team</em></p>
+        <p><em>— Miorah Team</em></p>
       `,
       status: "private",
       type: "post",
@@ -56,7 +56,7 @@ async function sendOtpViaWordPress(email: string, otp: string): Promise<boolean>
       headers: { Authorization: WC_AUTH, "Content-Type": "application/json" },
       body: JSON.stringify({
         to: email,
-        subject: `Your EmpireAE Verification Code: ${otp}`,
+        subject: `Your Miorah Verification Code: ${otp}`,
         message: `Your verification code is ${otp}. It expires in 10 minutes.`,
       }),
     });

@@ -115,7 +115,6 @@ export default function AboutPage() {
                 transition={{ duration: 1 }}
                 className="relative"
               >
-                <div className="absolute inset-0 border border-champagne-gold/30 translate-x-4 -translate-y-4 rounded-2xl" />
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 z-10">
                   <Image
                     src="/images/products/MI0012/MI0012-1 Green.png"

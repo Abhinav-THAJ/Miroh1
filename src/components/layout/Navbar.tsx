@@ -30,6 +30,7 @@ export default function Navbar() {
   });
 
   return (
+    <>
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
         isScrolled
@@ -153,10 +154,11 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+    </motion.header>
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-primary-bg/95 backdrop-blur-xl flex flex-col">
+        <div className="fixed inset-0 z-[100] bg-primary-bg/95 backdrop-blur-xl flex flex-col">
           <div className="flex items-center justify-between p-6 border-b border-white/5">
             <Link href="/" onClick={() => setMobileMenuOpen(false)}>
               <Image
@@ -216,9 +218,26 @@ export default function Navbar() {
                 )}
               </div>
             ))}
+            
+            <div className="pt-6 mt-2 border-t border-white/10 flex flex-col space-y-6">
+              <Link
+                href="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="font-serif text-2xl text-champagne-gold hover:text-white transition-colors flex items-center gap-3"
+              >
+                <User size={24} /> Login / Signin
+              </Link>
+              <Link
+                href="/wishlist"
+                onClick={() => setMobileMenuOpen(false)}
+                className="font-serif text-2xl text-warm-ivory hover:text-champagne-gold transition-colors flex items-center gap-3"
+              >
+                <Heart size={24} /> Wishlist
+              </Link>
+            </div>
           </div>
         </div>
       )}
-    </motion.header>
+    </>
   );
 }

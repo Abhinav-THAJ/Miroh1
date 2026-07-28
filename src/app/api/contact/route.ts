@@ -61,57 +61,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ── Send to WordPress via WooCommerce REST API (store as WP post) ──
-    // We create a "Private" WordPress post to store the contact message in the backend.
-    // This appears in WP Admin → Posts → All Posts (filter by Private / Contact)
-    const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-
-    const wpPostBody = {
-      title: `Contact: ${cleanName} <${cleanEmail}>`,
-      content: `<strong>Name:</strong> ${cleanName}\n\n<strong>Email:</strong> ${cleanEmail}\n\n<strong>Message:</strong>\n${cleanMessage}\n\n<em>Submitted: ${submittedAt} IST</em>`,
-      status: "private", // Only admins can see it in WP dashboard
-      type: "post",
-      comment_status: "closed",
-      ping_status: "closed",
-      meta: {
-        contact_name: cleanName,
-        contact_email: cleanEmail,
-        contact_message: cleanMessage,
-        contact_submitted_at: submittedAt,
+    // ── Send to WooCommerce as a 0-value Order ──
+    // Since we only have WooCommerce REST API keys (and not WP Application Passwords),
+    // the best way to get this into the store owner's dashboard is to create a $0 Order.
+    const wcOrderBody = {
+      payment_method: "Contact Form",
+      payment_method_title: "Website Contact Form Submission",
+      set_paid: true,
+      status: "processing",
+      billing: {
+        first_name: cleanName,
+        email: cleanEmail,
       },
+      customer_note: `CONTACT FORM MESSAGE:\n\n${cleanMessage}`,
+      line_items: [
+        {
+          name: "Contact Form Inquiry",
+          quantity: 1,
+          total: "0.00"
+        }
+      ]
     };
 
-    const wpRes = await fetch(`${WC_URL}wp-json/wp/v2/posts`, {
+    const wcRes = await fetch(`${WC_URL}wp-json/wc/v3/orders`, {
       method: "POST",
       headers: {
         Authorization: WC_AUTH,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(wpPostBody),
+      body: JSON.stringify(wcOrderBody),
     });
 
-    if (!wpRes.ok) {
-      const err = await wpRes.json().catch(() => ({}));
-      console.error("[Contact Form → WordPress] Failed:", err);
-
-      // Even if WP storage fails, attempt to log locally and still respond
-      // (so user gets a success response — admin should check WP logs)
+    if (!wcRes.ok) {
+      console.error("[Contact Form → WooCommerce] Failed:", await wcRes.text());
       return NextResponse.json(
-        {
-          success: false,
-          message: "Message could not be delivered. Please contact us directly at miorah.thereflectionofbeauty@gmail.com",
-        },
+        { success: false, message: "Could not deliver message to WooCommerce. Please try again." },
         { status: 500 }
       );
     }
 
-    const wpPost = await wpRes.json();
-    console.log(`[Contact Form] Saved to WordPress post ID: ${wpPost.id}`);
+    console.log(`[Contact Form Received] From: ${cleanName} <${cleanEmail}> sent to WooCommerce!`);
 
     return NextResponse.json({
       success: true,
       message: "Your message has been sent! We'll get back to you within 24 hours.",
-      postId: wpPost.id,
     });
   } catch (error) {
     console.error("[Contact Form Error]", error);

@@ -2,7 +2,7 @@ import ProductPageClient from "@/components/product/ProductPageClient";
 import { getProducts } from "@/lib/woocommerce";
 import { ALL_PRODUCTS } from "@/lib/data";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const allIds = new Set<string>();

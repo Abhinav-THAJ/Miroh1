@@ -66,7 +66,7 @@ export default function CollectionsPage() {
             features: [
               "Water & sweat-resistant",
               "Anti-tarnish protective coating",
-              "Includes EmpireAE gift box",
+              "Includes Miorah gift box",
             ],
             inStock: true,
           };
