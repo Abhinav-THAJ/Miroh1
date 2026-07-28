@@ -32,8 +32,8 @@ export default function EditorialShowcase() {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif text-warm-ivory leading-tight">
-              <span className="italic font-light text-champagne-gold mr-4">Curated</span> 
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-warm-ivory leading-tight sm:leading-tight">
+              <span className="italic font-light text-champagne-gold mr-2 sm:mr-4 block sm:inline">Curated</span> 
               Elegance for the Modern Muse.
             </h2>
           </motion.div>
