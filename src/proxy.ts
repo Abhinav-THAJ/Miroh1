@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // /checkout is NOT blocked either — it shows login prompt inline.
 // We only protect /account/... sub-paths if they exist.
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check session cookie validity for protected API routes
