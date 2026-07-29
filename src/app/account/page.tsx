@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -1285,7 +1285,7 @@ function Dashboard() {
 }
 
 // ─────────────────────────── Main Page ───────────────────────────
-export default function AccountPage() {
+function AccountPageContent() {
   const { isAuthenticated, checkSession, isLoading } = useAuthStore();
   const [sessionChecked, setSessionChecked] = useState(false);
   const checkedRef = useRef(false);
@@ -1323,4 +1323,22 @@ export default function AccountPage() {
   return isAuthenticated
     ? <Dashboard />
     : <AuthPanel onSuccess={() => setSessionChecked(true)} redirectUrl={redirectUrl} />;
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center flex-col gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-champagne-gold/10 border border-champagne-gold/30 flex items-center justify-center">
+            <RefreshCw className="w-6 h-6 text-champagne-gold animate-spin" />
+          </div>
+          <p className="text-sm text-muted-text font-light">Loading your account…</p>
+        </div>
+      </div>
+    }>
+      <AccountPageContent />
+    </Suspense>
+  );
 }
