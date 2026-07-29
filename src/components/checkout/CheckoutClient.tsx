@@ -2,16 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, ArrowRight, Lock, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ShieldCheck, Lock, CheckCircle2, User, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function CheckoutClient() {
   const { items, clearCart } = useCartStore();
+  const { isAuthenticated, user, checkSession } = useAuthStore();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,9 +32,41 @@ export default function CheckoutClient() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Always verify session on checkout page
+    checkSession().finally(() => setSessionChecked(true));
+  }, [checkSession]);
 
-  if (!mounted) return null;
+  // Pre-fill email and name from auth store when session is ready
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setFormData(prev => ({
+        ...prev,
+        email: prev.email || user.email || "",
+        fullName: prev.fullName || user.name || "",
+      }));
+
+      // Also try to fetch full customer data for phone/address pre-fill
+      fetch("/api/account/customer")
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) {
+            setFormData(prev => ({
+              ...prev,
+              phone: prev.phone || data.phone || data.billing?.phone || "",
+              fullName: prev.fullName || `${data.first_name || ""} ${data.last_name || ""}`.trim() || user.name || "",
+              address: prev.address || data.billing?.address_1 || "",
+              city: prev.city || data.billing?.city || "",
+              state: prev.state || data.billing?.state || "",
+              zip: prev.zip || data.billing?.postcode || "",
+              country: prev.country || data.billing?.country || "IN",
+            }));
+          }
+        })
+        .catch(() => { /* ignore */ });
+    }
+  }, [isAuthenticated, user]);
+
+  if (!mounted || !sessionChecked) return null;
 
   const parseNum = (p: string) => Number(p?.replace(/[^0-9.]/g, "") || 0);
   const subtotal = items.reduce((acc, item) => acc + parseNum(item.price) * item.quantity, 0);
@@ -42,6 +79,13 @@ export default function CheckoutClient() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If not authenticated, redirect to login with return URL
+    if (!isAuthenticated) {
+      router.push("/account?redirect=/checkout");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -50,6 +94,7 @@ export default function CheckoutClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items,
+          customer_id: user?.id,
           contact: { email: formData.email, phone: formData.phone },
           shipping: {
             fullName: formData.fullName,
@@ -91,12 +136,20 @@ export default function CheckoutClient() {
         <p className="text-muted-text max-w-md mx-auto mb-10 font-light leading-relaxed">
           Your order has been successfully placed. We have sent a confirmation email with your order details.
         </p>
-        <Link 
-          href="/"
-          className="px-8 py-4 bg-champagne-gold text-primary-bg rounded-xl font-medium tracking-widest uppercase text-sm hover:bg-white transition-colors"
-        >
-          Continue Shopping
-        </Link>
+        <div className="flex gap-4 flex-wrap justify-center">
+          <Link
+            href="/account"
+            className="px-8 py-4 bg-luxury-brown border border-champagne-gold/30 text-champagne-gold rounded-xl font-medium tracking-widest uppercase text-sm hover:bg-champagne-gold hover:text-primary-bg transition-colors"
+          >
+            View My Orders
+          </Link>
+          <Link 
+            href="/"
+            className="px-8 py-4 bg-champagne-gold text-primary-bg rounded-xl font-medium tracking-widest uppercase text-sm hover:bg-white transition-colors"
+          >
+            Continue Shopping
+          </Link>
+        </div>
       </div>
     );
   }
@@ -115,10 +168,30 @@ export default function CheckoutClient() {
     );
   }
 
+  const inputCls = "w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors";
+
   return (
     <div className="container mx-auto px-4 lg:px-8">
       <div className="mb-12 text-center md:text-left border-b border-white/10 pb-6">
         <h1 className="text-3xl md:text-4xl font-serif text-warm-ivory">Secure Checkout</h1>
+
+        {/* Auth Status Banner */}
+        <div className="mt-4">
+          {isAuthenticated ? (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm">
+              <User size={14} />
+              <span>Checking out as <strong>{user?.name || user?.email}</strong></span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-champagne-gold/10 border border-champagne-gold/20 rounded-xl text-sm">
+              <LogIn size={14} className="text-champagne-gold" />
+              <span className="text-warm-ivory/80">Have an account?</span>
+              <Link href="/account?redirect=/checkout" className="text-champagne-gold font-semibold hover:underline">
+                Sign in for faster checkout
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
@@ -135,10 +208,10 @@ export default function CheckoutClient() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="col-span-1 md:col-span-2">
-                  <input required name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="Email Address" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="Email Address" className={inputCls} />
                 </div>
                 <div>
-                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="Phone Number" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="Phone Number" className={inputCls} />
                 </div>
               </div>
             </section>
@@ -151,23 +224,26 @@ export default function CheckoutClient() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="col-span-1 md:col-span-2">
-                  <input required name="fullName" type="text" value={formData.fullName} onChange={handleInputChange} placeholder="Full Name" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="fullName" type="text" value={formData.fullName} onChange={handleInputChange} placeholder="Full Name" className={inputCls} />
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                  <input required name="address" type="text" value={formData.address} onChange={handleInputChange} placeholder="Street Address, Appt, Suite" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="address" type="text" value={formData.address} onChange={handleInputChange} placeholder="Street Address, Appt, Suite" className={inputCls} />
                 </div>
                 <div>
-                  <input required name="city" type="text" value={formData.city} onChange={handleInputChange} placeholder="City" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="city" type="text" value={formData.city} onChange={handleInputChange} placeholder="City" className={inputCls} />
                 </div>
                 <div>
-                  <input required name="state" type="text" value={formData.state} onChange={handleInputChange} placeholder="State / Province" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="state" type="text" value={formData.state} onChange={handleInputChange} placeholder="State / Province" className={inputCls} />
                 </div>
                 <div>
-                  <input required name="zip" type="text" value={formData.zip} onChange={handleInputChange} placeholder="PIN / ZIP Code" className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory placeholder:text-muted-text focus:outline-none focus:border-champagne-gold transition-colors" />
+                  <input required name="zip" type="text" value={formData.zip} onChange={handleInputChange} placeholder="PIN / ZIP Code" className={inputCls} />
                 </div>
                 <div>
-                  <select required name="country" value={formData.country} onChange={handleInputChange} className="w-full bg-luxury-brown/50 border border-white/10 rounded-xl px-5 py-4 text-warm-ivory focus:outline-none focus:border-champagne-gold transition-colors appearance-none">
+                  <select required name="country" value={formData.country} onChange={handleInputChange} className={`${inputCls} appearance-none`}>
                     <option value="IN">India</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="AE">UAE</option>
                   </select>
                 </div>
               </div>

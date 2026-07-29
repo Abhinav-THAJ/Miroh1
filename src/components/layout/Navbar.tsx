@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Search, Heart, ShoppingBag, User, Menu, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import { ALL_PRODUCTS } from "@/lib/data";
 
 const navLinks = [
@@ -27,6 +28,7 @@ export default function Navbar() {
 
   const { scrollY } = useScroll();
   const { toggleCart, items } = useCartStore();
+  const { isAuthenticated, user } = useAuthStore();
   
   // Calculate total quantity of items in cart
   const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
@@ -243,8 +245,17 @@ export default function Navbar() {
           <Link href="/wishlist" className="hover:text-champagne-gold transition-colors hidden sm:block">
             <Heart size={20} strokeWidth={1.5} />
           </Link>
-          <Link href="/account" className="hover:text-champagne-gold transition-colors hidden sm:block">
+          <Link
+            href="/account"
+            className={`transition-colors hidden sm:block relative group ${
+              isAuthenticated ? "text-champagne-gold" : "hover:text-champagne-gold"
+            }`}
+            title={isAuthenticated ? `My Account (${user?.name || user?.email})` : "Login / Sign Up"}
+          >
             <User size={20} strokeWidth={1.5} />
+            {isAuthenticated && (
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-champagne-gold" />
+            )}
           </Link>
           <button 
             onClick={toggleCart}
@@ -330,7 +341,10 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="font-serif text-2xl text-champagne-gold hover:text-white transition-colors flex items-center gap-3"
               >
-                <User size={24} /> Login / Signin
+                <User size={24} />
+                {isAuthenticated
+                  ? `My Account${user?.name ? ` (${user.name.split(" ")[0]})` : ""}`
+                  : "Login / Sign In"}
               </Link>
               <Link
                 href="/wishlist"

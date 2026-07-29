@@ -1,32 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
 export async function GET(request: NextRequest) {
   try {
-    const sessionCookie = request.cookies.get("auth_session")?.value;
+    const cookie = request.cookies.get("auth_session")?.value;
 
-    if (!sessionCookie) {
-      return NextResponse.json({ authenticated: false, user: null }, { status: 200 });
+    if (!cookie) {
+      return NextResponse.json({ authenticated: false, user: null });
     }
 
-    const payload = JSON.parse(Buffer.from(sessionCookie, "base64").toString("utf-8"));
-
-    // Validate session not older than 7 days
-    const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
-    if (Date.now() - payload.ts > SESSION_MAX_AGE) {
-      const response = NextResponse.json({ authenticated: false, user: null, reason: "session_expired" });
-      response.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
-      return response;
+    let payload: any;
+    try {
+      payload = JSON.parse(Buffer.from(cookie, "base64").toString("utf-8"));
+    } catch {
+      const r = NextResponse.json({ authenticated: false, user: null });
+      r.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
+      return r;
     }
 
-    return NextResponse.json({
+    // Expired?
+    if (!payload.ts || Date.now() - payload.ts > SESSION_MAX_AGE_MS) {
+      const r = NextResponse.json({
+        authenticated: false,
+        user: null,
+        reason: "session_expired",
+      });
+      r.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
+      return r;
+    }
+
+    // Sliding session — refresh timestamp
+    const refreshed = { ...payload, ts: Date.now() };
+    const newToken = Buffer.from(JSON.stringify(refreshed)).toString("base64");
+
+    const displayName =
+      payload.name ||
+      `${payload.firstName || ""} ${payload.lastName || ""}`.trim() ||
+      payload.email?.split("@")[0] ||
+      "Customer";
+
+    const response = NextResponse.json({
       authenticated: true,
       user: {
         id: payload.id,
         email: payload.email,
-        name: payload.name || payload.email.split("@")[0],
+        name: displayName,
+        firstName: payload.firstName || "",
+        lastName: payload.lastName || "",
+        username: payload.username || "",
       },
     });
+
+    response.cookies.set("auth_session", newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: SESSION_MAX_AGE_MS / 1000,
+      path: "/",
+    });
+
+    return response;
   } catch {
-    return NextResponse.json({ authenticated: false, user: null }, { status: 200 });
+    return NextResponse.json({ authenticated: false, user: null });
   }
 }
