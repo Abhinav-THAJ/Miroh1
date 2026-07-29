@@ -807,6 +807,150 @@ function OrderCard({ order }: { order: any }) {
   );
 }
 
+// ─────────────────────────── Address Components ───────────────────────────
+const inputCls =
+  "bg-primary-bg border border-white/10 rounded-xl px-4 py-3 text-warm-ivory text-sm focus:outline-none focus:border-champagne-gold transition-colors w-full";
+
+const AddrDisplay = ({ label, addr, icon: Icon, onEdit }: any) => (
+  <div className="bg-luxury-brown/50 border border-white/10 rounded-2xl p-5 group relative">
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-2">
+        <Icon size={13} className="text-champagne-gold" />
+        <span className="text-[10px] uppercase tracking-widest font-bold text-champagne-gold">{label}</span>
+      </div>
+      <button
+        onClick={onEdit}
+        className="p-1.5 rounded-lg hover:bg-white/10 text-muted-text hover:text-champagne-gold opacity-0 group-hover:opacity-100 transition-all"
+      >
+        <Edit2 size={13} />
+      </button>
+    </div>
+    {addr?.address_1 ? (
+      <p className="text-sm text-warm-ivory/80 font-light leading-relaxed">
+        {addr.first_name} {addr.last_name}<br />
+        {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ""}<br />
+        {addr.city}{addr.state ? `, ${addr.state}` : ""} {addr.postcode}<br />
+        {addr.country}
+        {addr.phone && <><br />{addr.phone}</>}
+      </p>
+    ) : (
+      <p className="text-sm text-muted-text font-light">No address saved.</p>
+    )}
+    <button
+      onClick={onEdit}
+      className="mt-3 text-xs text-champagne-gold hover:underline font-medium"
+    >
+      {addr?.address_1 ? "Edit" : "+ Add address"}
+    </button>
+  </div>
+);
+
+const AddrForm = ({ title, formData, setFormData, onSave, onCancel, saving, showPhone = false }: any) => {
+  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setFormData((p: any) => ({ ...p, postcode: val }));
+
+    if (val.length >= 5) {
+      try {
+        const country = (formData.country || "IN").toLowerCase();
+        if (country === "in" && val.length === 6) {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${val}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data[0]?.Status === "Success" && data[0]?.PostOffice?.length > 0) {
+              const po = data[0].PostOffice[0];
+              setFormData((p: any) => ({
+                ...p,
+                city: po.District || po.Block || p.city,
+                state: po.State || p.state
+              }));
+              return;
+            }
+          }
+        }
+        
+        const res2 = await fetch(`https://api.zippopotam.us/${country}/${val}`);
+        if (res2.ok) {
+          const data2 = await res2.json();
+          if (data2.places && data2.places.length > 0) {
+            setFormData((p: any) => ({
+              ...p,
+              city: data2.places[0]["place name"],
+              state: data2.places[0]["state"]
+            }));
+          }
+        }
+      } catch (err) {}
+    }
+  };
+
+  return (
+    <form onSubmit={onSave} className="bg-luxury-brown/50 border border-champagne-gold/30 rounded-2xl p-6 flex flex-col gap-4">
+    <div className="flex items-center justify-between">
+      <h3 className="text-sm font-semibold text-warm-ivory uppercase tracking-wider">{title}</h3>
+      <button type="button" onClick={onCancel} className="text-muted-text hover:text-red-400 transition-colors">
+        <X size={15} />
+      </button>
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">First Name</label>
+        <input type="text" value={formData.first_name || ""} onChange={e => setFormData((p: any) => ({ ...p, first_name: e.target.value }))} placeholder="First name" className={inputCls} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Last Name</label>
+        <input type="text" value={formData.last_name || ""} onChange={e => setFormData((p: any) => ({ ...p, last_name: e.target.value }))} placeholder="Last name" className={inputCls} />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Address Line 1 *</label>
+        <input required type="text" value={formData.address_1 || ""} onChange={e => setFormData((p: any) => ({ ...p, address_1: e.target.value }))} placeholder="Street address" className={inputCls} />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Address Line 2</label>
+        <input type="text" value={formData.address_2 || ""} onChange={e => setFormData((p: any) => ({ ...p, address_2: e.target.value }))} placeholder="Apt, suite, floor (optional)" className={inputCls} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">PIN / ZIP *</label>
+        <input required type="text" value={formData.postcode || ""} onChange={handleZipChange} placeholder="Postcode" className={inputCls} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">City *</label>
+        <input required type="text" value={formData.city || ""} onChange={e => setFormData((p: any) => ({ ...p, city: e.target.value }))} placeholder="City" className={inputCls} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">State *</label>
+        <input required type="text" value={formData.state || ""} onChange={e => setFormData((p: any) => ({ ...p, state: e.target.value }))} placeholder="State" className={inputCls} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Country *</label>
+        <select required value={formData.country || "IN"} onChange={e => setFormData((p: any) => ({ ...p, country: e.target.value }))} className={`${inputCls} appearance-none`}>
+          <option value="IN">India</option>
+          <option value="US">United States</option>
+          <option value="GB">United Kingdom</option>
+          <option value="AE">UAE</option>
+          <option value="SG">Singapore</option>
+          <option value="CA">Canada</option>
+          <option value="AU">Australia</option>
+        </select>
+      </div>
+      {showPhone && (
+        <div className="sm:col-span-2">
+          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Phone</label>
+          <input type="tel" value={formData.phone || ""} onChange={e => setFormData((p: any) => ({ ...p, phone: e.target.value }))} placeholder="+91 XXXXX XXXXX" className={inputCls} />
+        </div>
+      )}
+    </div>
+    <div className="flex gap-3 justify-end pt-2">
+      <button type="button" onClick={onCancel} className="px-4 py-2.5 rounded-xl border border-white/10 text-muted-text hover:text-warm-ivory text-xs font-semibold uppercase tracking-wider transition-colors">Cancel</button>
+      <button type="submit" disabled={saving} className="px-5 py-2.5 rounded-xl bg-champagne-gold text-primary-bg text-xs font-semibold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-60 flex items-center gap-2">
+        {saving && <RefreshCw size={12} className="animate-spin" />}
+        Save Address
+      </button>
+    </div>
+  </form>
+  );
+};
+
 // ─────────────────────────── Dashboard ───────────────────────────
 function Dashboard() {
   const { user, logout, setUser } = useAuthStore();
@@ -960,109 +1104,6 @@ function Dashboard() {
     } catch { showToast("Network error.", "error"); }
     finally { setIsSavingAddress(false); }
   };
-
-  const inputCls =
-    "bg-primary-bg border border-white/10 rounded-xl px-4 py-3 text-warm-ivory text-sm focus:outline-none focus:border-champagne-gold transition-colors w-full";
-
-  const AddrDisplay = ({ label, addr, icon: Icon, onEdit }: any) => (
-    <div className="bg-luxury-brown/50 border border-white/10 rounded-2xl p-5 group relative">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Icon size={13} className="text-champagne-gold" />
-          <span className="text-[10px] uppercase tracking-widest font-bold text-champagne-gold">{label}</span>
-        </div>
-        <button
-          onClick={onEdit}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-muted-text hover:text-champagne-gold opacity-0 group-hover:opacity-100 transition-all"
-        >
-          <Edit2 size={13} />
-        </button>
-      </div>
-      {addr?.address_1 ? (
-        <p className="text-sm text-warm-ivory/80 font-light leading-relaxed">
-          {addr.first_name} {addr.last_name}<br />
-          {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ""}<br />
-          {addr.city}{addr.state ? `, ${addr.state}` : ""} {addr.postcode}<br />
-          {addr.country}
-          {addr.phone && <><br />{addr.phone}</>}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-text font-light">No address saved.</p>
-      )}
-      <button
-        onClick={onEdit}
-        className="mt-3 text-xs text-champagne-gold hover:underline font-medium"
-      >
-        {addr?.address_1 ? "Edit" : "+ Add address"}
-      </button>
-    </div>
-  );
-
-  const AddrForm = ({ title, formData, setFormData, onSave, onCancel, saving, showPhone = false }: any) => (
-    <form onSubmit={onSave} className="bg-luxury-brown/50 border border-champagne-gold/30 rounded-2xl p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-warm-ivory uppercase tracking-wider">{title}</h3>
-        <button type="button" onClick={onCancel} className="text-muted-text hover:text-red-400 transition-colors">
-          <X size={15} />
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">First Name</label>
-          <input type="text" value={formData.first_name || ""} onChange={e => setFormData((p: any) => ({ ...p, first_name: e.target.value }))} placeholder="First name" className={inputCls} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Last Name</label>
-          <input type="text" value={formData.last_name || ""} onChange={e => setFormData((p: any) => ({ ...p, last_name: e.target.value }))} placeholder="Last name" className={inputCls} />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Address Line 1 *</label>
-          <input required type="text" value={formData.address_1 || ""} onChange={e => setFormData((p: any) => ({ ...p, address_1: e.target.value }))} placeholder="Street address" className={inputCls} />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Address Line 2</label>
-          <input type="text" value={formData.address_2 || ""} onChange={e => setFormData((p: any) => ({ ...p, address_2: e.target.value }))} placeholder="Apt, suite, floor (optional)" className={inputCls} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">City *</label>
-          <input required type="text" value={formData.city || ""} onChange={e => setFormData((p: any) => ({ ...p, city: e.target.value }))} placeholder="City" className={inputCls} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">State *</label>
-          <input required type="text" value={formData.state || ""} onChange={e => setFormData((p: any) => ({ ...p, state: e.target.value }))} placeholder="State" className={inputCls} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">PIN / ZIP *</label>
-          <input required type="text" value={formData.postcode || ""} onChange={e => setFormData((p: any) => ({ ...p, postcode: e.target.value }))} placeholder="Postcode" className={inputCls} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Country *</label>
-          <select required value={formData.country || "IN"} onChange={e => setFormData((p: any) => ({ ...p, country: e.target.value }))} className={`${inputCls} appearance-none`}>
-            <option value="IN">India</option>
-            <option value="US">United States</option>
-            <option value="GB">United Kingdom</option>
-            <option value="AE">UAE</option>
-            <option value="SG">Singapore</option>
-            <option value="CA">Canada</option>
-            <option value="AU">Australia</option>
-          </select>
-        </div>
-        {showPhone && (
-          <div className="sm:col-span-2">
-            <label className="text-xs text-muted-text uppercase tracking-wider mb-1 block">Phone</label>
-            <input type="tel" value={formData.phone || ""} onChange={e => setFormData((p: any) => ({ ...p, phone: e.target.value }))} placeholder="+91 XXXXX XXXXX" className={inputCls} />
-          </div>
-        )}
-      </div>
-      <div className="flex gap-3 justify-end pt-2">
-        <button type="button" onClick={onCancel} className="px-4 py-2.5 rounded-xl border border-white/10 text-muted-text hover:text-warm-ivory text-xs font-semibold uppercase tracking-wider transition-colors">Cancel</button>
-        <button type="submit" disabled={saving} className="px-5 py-2.5 rounded-xl bg-champagne-gold text-primary-bg text-xs font-semibold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-60 flex items-center gap-2">
-          {saving && <RefreshCw size={12} className="animate-spin" />}
-          Save Address
-        </button>
-      </div>
-    </form>
-  );
 
   return (
     <>

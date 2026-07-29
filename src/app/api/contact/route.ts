@@ -74,13 +74,6 @@ export async function POST(request: NextRequest) {
         email: cleanEmail,
       },
       customer_note: `CONTACT FORM MESSAGE:\n\n${cleanMessage}`,
-      line_items: [
-        {
-          name: "Contact Form Inquiry",
-          quantity: 1,
-          total: "0.00"
-        }
-      ]
     };
 
     const wcRes = await fetch(`${WC_URL}wp-json/wc/v3/orders`, {

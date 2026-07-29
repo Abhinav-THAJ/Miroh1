@@ -77,6 +77,44 @@ export default function CheckoutClient() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setFormData(prev => ({ ...prev, zip: val }));
+
+    if (val.length >= 5) {
+      try {
+        const country = (formData.country || "IN").toLowerCase();
+        if (country === "in" && val.length === 6) {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${val}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data[0]?.Status === "Success" && data[0]?.PostOffice?.length > 0) {
+              const po = data[0].PostOffice[0];
+              setFormData(prev => ({
+                ...prev,
+                city: po.District || po.Block || prev.city,
+                state: po.State || prev.state
+              }));
+              return;
+            }
+          }
+        }
+        
+        const res2 = await fetch(`https://api.zippopotam.us/${country}/${val}`);
+        if (res2.ok) {
+          const data2 = await res2.json();
+          if (data2.places && data2.places.length > 0) {
+            setFormData(prev => ({
+              ...prev,
+              city: data2.places[0]["place name"],
+              state: data2.places[0]["state"]
+            }));
+          }
+        }
+      } catch (err) {}
+    }
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -230,13 +268,13 @@ export default function CheckoutClient() {
                   <input required name="address" type="text" value={formData.address} onChange={handleInputChange} placeholder="Street Address, Appt, Suite" className={inputCls} />
                 </div>
                 <div>
+                  <input required name="zip" type="text" value={formData.zip} onChange={handleZipChange} placeholder="PIN / ZIP Code" className={inputCls} />
+                </div>
+                <div>
                   <input required name="city" type="text" value={formData.city} onChange={handleInputChange} placeholder="City" className={inputCls} />
                 </div>
                 <div>
                   <input required name="state" type="text" value={formData.state} onChange={handleInputChange} placeholder="State / Province" className={inputCls} />
-                </div>
-                <div>
-                  <input required name="zip" type="text" value={formData.zip} onChange={handleInputChange} placeholder="PIN / ZIP Code" className={inputCls} />
                 </div>
                 <div>
                   <select required name="country" value={formData.country} onChange={handleInputChange} className={`${inputCls} appearance-none`}>

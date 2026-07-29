@@ -67,7 +67,7 @@ export default function OnamCollection() {
             </motion.div>
           </div>
 
-          <Link href="/collections" className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block group">
+          <Link href="/product/MI0041" className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block group">
             <Image
               src="/images/products/MI0041/MI0041-1.png"
               alt="Onam Collection"

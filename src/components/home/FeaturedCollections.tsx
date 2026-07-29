@@ -12,6 +12,7 @@ const collections = [
     title: "Traditional",
     subtitle: "HERITAGE ROOTS",
     image: "/images/products/MI0024/MI0024-1 Green.png",
+    productLink: "/product/MI0024",
     description: "Embrace the timeless elegance of classic designs, meticulously crafted to honor cultural heritage.",
   },
   {
@@ -19,6 +20,7 @@ const collections = [
     title: "Bridal",
     subtitle: "THE BIG DAY",
     image: "/images/products/MI0029/MI0029-1.png",
+    productLink: "/product/MI0029",
     description: "Make your unforgettable moments shine brighter with our exquisite, show-stopping bridal suites.",
   },
   {
@@ -26,6 +28,7 @@ const collections = [
     title: "Premium",
     subtitle: "EXCLUSIVE SELECTION",
     image: "/images/products/MI0034/MI0034-1.png",
+    productLink: "/product/MI0034",
     description: "The pinnacle of our craftsmanship. Bold, intricate, and uncompromising in luxury.",
   },
 ];
@@ -110,7 +113,7 @@ export default function FeaturedCollections() {
 
           {/* Right Side: Image Reveal */}
           <Link
-            href="/collections"
+            href={collections[activeIndex].productLink}
             className="w-full lg:w-1/2 relative h-[380px] sm:h-[500px] md:h-[600px] lg:h-[750px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 mt-6 lg:mt-0 block group cursor-pointer"
           >
             <AnimatePresence mode="wait">

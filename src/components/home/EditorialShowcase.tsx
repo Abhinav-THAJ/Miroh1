@@ -57,7 +57,7 @@ export default function EditorialShowcase() {
             className="w-full lg:w-5/12 relative"
             style={{ y: y1 }}
           >
-            <Link href="/collections" className="group relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 block">
+            <Link href="/product/MI0012" className="group relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 block">
               <Image
                 src="/images/products/MI0012/MI0012-1 Green.png"
                 alt="Handpicked Designer Jewellery"
@@ -68,12 +68,12 @@ export default function EditorialShowcase() {
             <div className="mt-8 flex items-center justify-between">
               <div>
 
-                <Link href="/collections">
+                <Link href="/product/MI0012">
                   <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Royal Green Cascade</h3>
                 </Link>
               </div>
               <Link
-                href="/collections"
+                href="/product/MI0012"
                 className="w-12 h-12 rounded-full border border-champagne-gold/30 flex items-center justify-center text-champagne-gold hover:bg-champagne-gold hover:text-primary-bg transition-colors"
               >
                 <ArrowUpRight className="w-5 h-5" />
@@ -89,7 +89,7 @@ export default function EditorialShowcase() {
               className="flex flex-col sm:flex-row gap-8 items-center lg:items-start"
               style={{ y: y2 }}
             >
-              <Link href="/collections" className="group relative w-full sm:w-1/2 aspect-square overflow-hidden rounded-2xl border border-champagne-gold/20 shadow-2xl block">
+              <Link href="/product/MI0017" className="group relative w-full sm:w-1/2 aspect-square overflow-hidden rounded-2xl border border-champagne-gold/20 shadow-2xl block">
                 <Image
                   src="/images/products/MI0017/MI0017-1.png"
                   alt="Crystal Pear Ring"
@@ -99,12 +99,12 @@ export default function EditorialShowcase() {
               </Link>
               <div className="w-full sm:w-1/2 flex flex-col justify-center text-center sm:text-left mt-6 sm:mt-0">
                 <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-3 font-semibold">Premium Grade</p>
-                <Link href="/collections">
+                <Link href="/product/MI0017">
                   <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors mb-4">Crystal Pear Ring</h3>
                 </Link>
                 <p className="text-muted-text font-light text-sm mb-6">A delicate fusion of classic charm and modern brilliance, perfect for any occasion.</p>
                 <Link
-                  href="/collections"
+                  href="/product/MI0017"
                   className="inline-block text-xs uppercase tracking-widest text-champagne-gold hover:text-white border-b border-champagne-gold/30 hover:border-white pb-1 w-fit transition-colors"
                 >
                   Discover Piece
@@ -117,7 +117,7 @@ export default function EditorialShowcase() {
               className="relative self-end w-full sm:w-4/5 lg:w-3/4"
               style={{ y: y3 }}
             >
-              <Link href="/collections" className="group relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 block">
+              <Link href="/product/MI0022" className="group relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 block">
                 <Image
                   src="/images/products/MI0022/MI0022-1 Coin.png"
                   alt="Traditional Coin Necklace"
@@ -127,7 +127,7 @@ export default function EditorialShowcase() {
               </Link>
               <div className="absolute -bottom-10 left-0 sm:-left-10 lg:-left-20 bg-primary-bg p-8 rounded-tr-3xl border-t border-r border-white/5 shadow-2xl max-w-[80%]">
                 <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-2 font-semibold">Heritage Collection</p>
-                <Link href="/collections">
+                <Link href="/product/MI0022">
                   <h3 className="font-serif text-2xl lg:text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Traditional Coin Necklace</h3>
                 </Link>
               </div>
