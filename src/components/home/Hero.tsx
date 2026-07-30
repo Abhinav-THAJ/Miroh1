@@ -210,7 +210,7 @@ export default function Hero() {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-champagne-gold/20 via-transparent to-rose-gold/20 blur-xl opacity-70 pointer-events-none transform scale-95" />
 
             {/* Main Showcase Container */}
-            <div className="relative w-full max-w-[340px] sm:max-w-[460px] mx-auto aspect-[4/5] rounded-2xl overflow-hidden bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group">
+            <div className="relative w-full max-w-[340px] sm:max-w-[460px] mx-auto aspect-[4/5] rounded-2xl overflow-hidden bg-luxury-brown/50 shadow-[0_25px_60px_rgba(0,0,0,0.7)] group isolate transform-gpu">
               
               {/* Animated Slide Image Switcher */}
               <AnimatePresence mode="wait">
@@ -227,7 +227,7 @@ export default function Hero() {
                       src={activeSlide.image}
                       alt={activeSlide.title}
                       fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-out"
+                      className="object-cover object-center"
                       priority
                     />
                     

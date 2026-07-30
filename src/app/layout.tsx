@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full antialiased dark`}
+      className={`${inter.variable} ${playfair.variable} ${cormorant.variable} h-full antialiased dark scroll-smooth`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <div className="flex flex-col min-h-screen w-full overflow-x-hidden relative">

@@ -92,10 +92,7 @@ export default function ProductGallery({
 
         {/* Image displaying with Smooth Framer Motion transition */}
         <div
-          className="relative w-full h-full cursor-zoom-in"
-          onMouseEnter={() => setIsZoomed(true)}
-          onMouseLeave={() => setIsZoomed(false)}
-          onMouseMove={handleMouseMove}
+          className="relative w-full h-full cursor-pointer"
           onClick={() => setIsLightboxOpen(true)}
         >
           <AnimatePresence mode="wait">
@@ -112,16 +109,7 @@ export default function ProductGallery({
                 alt={productName}
                 fill
                 priority
-                className={`object-cover transition-transform duration-200 ${
-                  isZoomed ? "scale-150" : "scale-100"
-                }`}
-                style={
-                  isZoomed
-                    ? {
-                        transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
-                      }
-                    : undefined
-                }
+                className="object-cover transition-transform duration-200"
               />
             </motion.div>
           </AnimatePresence>
