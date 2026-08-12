@@ -131,7 +131,7 @@ function issueSession(user: {
   response.cookies.set("auth_session", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: SESSION_MAX_AGE_MS / 1000,
     path: "/",
   });
