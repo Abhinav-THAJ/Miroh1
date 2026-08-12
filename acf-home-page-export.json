@@ -1,0 +1,212 @@
+[
+  {
+    "key": "group_miorah_home_page",
+    "title": "Home Page Settings",
+    "fields": [
+      {
+        "key": "field_hero_slides",
+        "label": "Hero Slides",
+        "name": "hero_slides",
+        "type": "repeater",
+        "layout": "block",
+        "button_label": "Add Slide",
+        "sub_fields": [
+          {
+            "key": "field_slide_tag",
+            "label": "Tag",
+            "name": "tag",
+            "type": "text"
+          },
+          {
+            "key": "field_slide_title",
+            "label": "Title",
+            "name": "title",
+            "type": "text"
+          },
+          {
+            "key": "field_slide_subtitle",
+            "label": "Subtitle",
+            "name": "subtitle",
+            "type": "text"
+          },
+          {
+            "key": "field_slide_price",
+            "label": "Price",
+            "name": "price",
+            "type": "text"
+          },
+          {
+            "key": "field_slide_image",
+            "label": "Image",
+            "name": "image",
+            "type": "url",
+            "instructions": "Enter the URL of the image"
+          },
+          {
+            "key": "field_slide_link",
+            "label": "Link",
+            "name": "link",
+            "type": "text"
+          },
+          {
+            "key": "field_slide_badge",
+            "label": "Badge",
+            "name": "badge",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "key": "field_editorial_showcase",
+        "label": "Editorial Showcase",
+        "name": "editorial_showcase",
+        "type": "group",
+        "layout": "block",
+        "sub_fields": [
+          {
+            "key": "field_ed_heading",
+            "label": "Heading",
+            "name": "heading",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_subheading",
+            "label": "Subheading",
+            "name": "subheading",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_description",
+            "label": "Description",
+            "name": "description",
+            "type": "textarea"
+          },
+          {
+            "key": "field_ed_left_image",
+            "label": "Left Image URL",
+            "name": "left_image",
+            "type": "url"
+          },
+          {
+            "key": "field_ed_left_title",
+            "label": "Left Title",
+            "name": "left_title",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_left_link",
+            "label": "Left Link",
+            "name": "left_link",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_top_right_image",
+            "label": "Top Right Image URL",
+            "name": "top_right_image",
+            "type": "url"
+          },
+          {
+            "key": "field_ed_top_right_title",
+            "label": "Top Right Title",
+            "name": "top_right_title",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_top_right_link",
+            "label": "Top Right Link",
+            "name": "top_right_link",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_bottom_right_image",
+            "label": "Bottom Right Image URL",
+            "name": "bottom_right_image",
+            "type": "url"
+          },
+          {
+            "key": "field_ed_bottom_right_title",
+            "label": "Bottom Right Title",
+            "name": "bottom_right_title",
+            "type": "text"
+          },
+          {
+            "key": "field_ed_bottom_right_link",
+            "label": "Bottom Right Link",
+            "name": "bottom_right_link",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "key": "field_onam_collection",
+        "label": "Onam Collection",
+        "name": "onam_collection",
+        "type": "group",
+        "layout": "block",
+        "sub_fields": [
+          {
+            "key": "field_onam_is_visible",
+            "label": "Is Visible?",
+            "name": "is_visible",
+            "type": "true_false",
+            "default_value": 1
+          },
+          {
+            "key": "field_onam_badge",
+            "label": "Badge Text",
+            "name": "badge_text",
+            "type": "text"
+          },
+          {
+            "key": "field_onam_heading",
+            "label": "Heading",
+            "name": "heading",
+            "type": "text"
+          },
+          {
+            "key": "field_onam_description",
+            "label": "Description",
+            "name": "description",
+            "type": "textarea"
+          },
+          {
+            "key": "field_onam_image",
+            "label": "Image URL",
+            "name": "image",
+            "type": "url"
+          },
+          {
+            "key": "field_onam_link",
+            "label": "Button Link",
+            "name": "link",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "location": [
+      [
+        {
+          "param": "page_type",
+          "operator": "==",
+          "value": "front_page"
+        }
+      ],
+      [
+        {
+          "param": "post_type",
+          "operator": "==",
+          "value": "page"
+        }
+      ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": ""
+  }
+]

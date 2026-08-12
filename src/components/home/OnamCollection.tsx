@@ -6,10 +6,16 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
-export default function OnamCollection() {
-  const [isVisible] = useState(true);
+export default function OnamCollection({ acfData }: { acfData?: any }) {
+  const isVisible = acfData?.is_visible !== false;
   
   if (!isVisible) return null;
+
+  const badgeText = acfData?.badge_text || "Seasonal Exclusive";
+  const heading = acfData?.heading || "The <span class=\"italic text-champagne-gold font-light\">Onam</span> Collection";
+  const description = acfData?.description || "Celebrate the festive season with our exclusive traditional designs. Elegance curated for your grand celebrations.";
+  const linkUrl = acfData?.link || "/collections";
+  const imageUrl = acfData?.image || "/images/products/MI0041/MI0041-1.png";
 
   return (
     <section className="py-24 bg-primary-bg relative overflow-hidden border-t border-white/5">
@@ -32,15 +38,16 @@ export default function OnamCollection() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-12 h-[1px] bg-champagne-gold" />
-                <span className="text-champagne-gold uppercase tracking-[0.3em] text-xs font-semibold">Seasonal Exclusive</span>
+                <span className="text-champagne-gold uppercase tracking-[0.3em] text-xs font-semibold">{badgeText}</span>
               </div>
               
-              <h2 className="text-5xl lg:text-7xl font-serif text-warm-ivory mb-6">
-                The <span className="italic text-champagne-gold font-light">Onam</span> Collection
-              </h2>
+              <h2 
+                className="text-5xl lg:text-7xl font-serif text-warm-ivory mb-6"
+                dangerouslySetInnerHTML={{ __html: heading }}
+              />
               
               <p className="text-muted-text text-lg font-light mb-10 max-w-md">
-                Celebrate the festive season with our exclusive traditional designs. Elegance curated for your grand celebrations.
+                {description}
               </p>
 
               {/* Countdown Timer Mockup */}
@@ -58,7 +65,7 @@ export default function OnamCollection() {
               </div>
 
               <Link
-                href="/collections"
+                href={linkUrl}
                 className="flex items-center gap-3 bg-champagne-gold text-primary-bg px-8 py-4 rounded-full font-medium tracking-wide hover:bg-white transition-colors w-fit group"
               >
                 Shop Onam Collection
@@ -67,9 +74,9 @@ export default function OnamCollection() {
             </motion.div>
           </div>
 
-          <Link href="/product/MI0041" className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block group">
+          <Link href={linkUrl} className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block group">
             <Image
-              src="/images/products/MI0041/MI0041-1.png"
+              src={imageUrl}
               alt="Onam Collection"
               fill
               className="object-cover object-center"

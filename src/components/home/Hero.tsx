@@ -59,7 +59,7 @@ const SPARKLES_DATA = [
   { top: "40%", left: "48%", size: 2, delay: 1.2 },
 ];
 
-export default function Hero() {
+export default function Hero({ acfData }: { acfData?: any }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,25 +73,26 @@ export default function Hero() {
   const yImage = useTransform(scrollYProgress, [0, 1], [0, 80]);
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
 
+  const slides = acfData && acfData.length > 0 ? acfData : HERO_SLIDES;
+  const activeSlide = slides[currentSlide] || slides[0];
+
   // Auto-play luxury showcase slide carousel
   useEffect(() => {
     if (!isAutoPlaying) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
-
-  const activeSlide = HERO_SLIDES[currentSlide];
+  }, [isAutoPlaying, slides.length]);
 
   const handleNext = () => {
     setIsAutoPlaying(false);
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const handlePrev = () => {
     setIsAutoPlaying(false);
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   return (
@@ -215,7 +216,7 @@ export default function Hero() {
               {/* Animated Slide Image Switcher */}
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={activeSlide.id}
+                  key={activeSlide.id || activeSlide.title}
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
@@ -285,9 +286,9 @@ export default function Hero() {
 
             {/* Slide Switcher Controls / Dots */}
             <div className="flex items-center gap-3 mt-6 z-20">
-              {HERO_SLIDES.map((slide, idx) => (
+              {slides.map((slide: any, idx: number) => (
                 <button
-                  key={slide.id}
+                  key={slide.id || idx}
                   onClick={() => {
                     setIsAutoPlaying(false);
                     setCurrentSlide(idx);

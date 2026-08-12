@@ -10,16 +10,22 @@ import FeaturedCollections from "@/components/home/FeaturedCollections";
 import OnamCollection from "@/components/home/OnamCollection";
 import Footer from "@/components/layout/Footer";
 import { getProducts } from "@/lib/woocommerce";
+import { getHomePageData } from "@/lib/wordpress";
 import { ALL_PRODUCTS, MOCK_BEST_SELLERS, MOCK_NEW_ARRIVALS } from "@/lib/data";
 
 export default function Home() {
   const [newArrivals, setNewArrivals] = useState<any[]>(MOCK_NEW_ARRIVALS);
   const [bestSellers, setBestSellers] = useState<any[]>(MOCK_BEST_SELLERS);
+  const [acfData, setAcfData] = useState<any>(null);
   const fetchedRef = useRef(false);
 
   useEffect(() => {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
+
+    getHomePageData().then((data) => {
+      if (data) setAcfData(data);
+    });
 
     // Fetch live products client-side so it works dynamically in static hosting
     getProducts().then((wcProducts) => {
@@ -69,11 +75,11 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1 w-full">
-        <Hero />
+        <Hero acfData={acfData?.hero_slides} />
         <NewArrivals products={newArrivals} />
         <BestSellers products={bestSellers} />
-        <EditorialShowcase />
-        <OnamCollection />
+        <EditorialShowcase acfData={acfData?.editorial_showcase} />
+        <OnamCollection acfData={acfData?.onam_collection} />
         <FeaturedCollections />
       </main>
 

@@ -11,19 +11,30 @@ export async function POST(request: Request) {
 
     const AUTH_HEADER = "Basic " + Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString("base64");
 
+    const parseNum = (p: string) => Number(p?.replace(/[^0-9.]/g, "") || 0);
+
     // Format line items for WooCommerce
-    const line_items = items.map((item: any) => ({
-      product_id: parseInt(String(item.id).replace(/[^0-9]/g, "") || "0") || undefined, // fallback if ID is not purely numeric
-      name: item.name,
-      quantity: item.quantity,
-      // Pass the local price to WC if necessary, or let WC calculate it
-    }));
+    const line_items = items.map((item: any) => {
+      const parsedId = parseInt(String(item.id));
+      // If it's a valid numeric ID (likely from WP/WC), use it. Otherwise, treat as custom item.
+      const isWCProduct = !isNaN(parsedId) && parsedId > 0 && String(item.id) === String(parsedId);
+      const priceVal = parseNum(item.price);
+      
+      return {
+        product_id: isWCProduct ? parsedId : undefined,
+        name: item.name,
+        quantity: item.quantity,
+        total: String(priceVal * item.quantity), // pass price explicitly so it doesn't default to 0
+      };
+    });
 
     // Construct the WooCommerce Order payload
-    const orderData = {
-      payment_method: payment === "COD" ? "cod" : "bacs",
-      payment_method_title: payment === "COD" ? "Cash on Delivery" : "Direct Bank Transfer",
-      set_paid: false,
+    const isRazorpay = payment === "ONLINE" || payment === "RAZORPAY";
+    
+    const orderData: any = {
+      payment_method: isRazorpay ? "razorpay" : "cod",
+      payment_method_title: isRazorpay ? "Razorpay" : "Cash on Delivery",
+      set_paid: isRazorpay && body.razorpay_payment_id ? true : false,
       billing: {
         first_name: shipping.fullName,
         last_name: "",
@@ -48,6 +59,10 @@ export async function POST(request: Request) {
       },
       line_items: line_items,
     };
+
+    if (isRazorpay && body.razorpay_payment_id) {
+      orderData.transaction_id = body.razorpay_payment_id;
+    }
 
     const res = await fetch(`${WC_URL}/wp-json/wc/v3/orders`, {
       method: "POST",

@@ -6,7 +6,23 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
-export default function EditorialShowcase() {
+export default function EditorialShowcase({ acfData }: { acfData?: any }) {
+  const heading = acfData?.heading || "Elegance for the Modern Muse.";
+  const subheading = acfData?.subheading || "Curated";
+  const description = acfData?.description || "Admire the breathtaking craftsmanship and heritage behind every piece in our exclusive showroom.";
+  
+  const leftImage = acfData?.left_image || "/images/products/MI0012/MI0012-1 Green.png";
+  const leftTitle = acfData?.left_title || "Royal Green Cascade";
+  const leftLink = acfData?.left_link || "/product/MI0012";
+
+  const topRightImage = acfData?.top_right_image || "/images/products/MI0017/MI0017-1.png";
+  const topRightTitle = acfData?.top_right_title || "Crystal Pear Ring";
+  const topRightLink = acfData?.top_right_link || "/product/MI0017";
+
+  const bottomRightImage = acfData?.bottom_right_image || "/images/products/MI0022/MI0022-1 Coin.png";
+  const bottomRightTitle = acfData?.bottom_right_title || "Traditional Coin Necklace";
+  const bottomRightLink = acfData?.bottom_right_link || "/product/MI0022";
+
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -33,8 +49,8 @@ export default function EditorialShowcase() {
             className="max-w-3xl"
           >
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-warm-ivory leading-tight sm:leading-tight">
-              <span className="italic font-light text-champagne-gold mr-2 sm:mr-4 block sm:inline">Curated</span> 
-              Elegance for the Modern Muse.
+              <span className="italic font-light text-champagne-gold mr-2 sm:mr-4 block sm:inline">{subheading}</span> 
+              {heading}
             </h2>
           </motion.div>
           
@@ -45,7 +61,7 @@ export default function EditorialShowcase() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Admire the breathtaking craftsmanship and heritage behind every piece in our exclusive showroom.
+            {description}
           </motion.p>
         </div>
 
@@ -57,10 +73,10 @@ export default function EditorialShowcase() {
             className="w-full lg:w-5/12 relative"
             style={{ y: y1 }}
           >
-            <Link href="/product/MI0012" className="group relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 block">
+            <Link href={leftLink} className="group relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 block">
               <Image
-                src="/images/products/MI0012/MI0012-1 Green.png"
-                alt="Handpicked Designer Jewellery"
+                src={leftImage}
+                alt={leftTitle}
                 fill
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
               />
@@ -68,12 +84,12 @@ export default function EditorialShowcase() {
             <div className="mt-8 flex items-center justify-between">
               <div>
 
-                <Link href="/product/MI0012">
-                  <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Royal Green Cascade</h3>
+                <Link href={leftLink}>
+                  <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">{leftTitle}</h3>
                 </Link>
               </div>
               <Link
-                href="/product/MI0012"
+                href={leftLink}
                 className="w-12 h-12 rounded-full border border-champagne-gold/30 flex items-center justify-center text-champagne-gold hover:bg-champagne-gold hover:text-primary-bg transition-colors"
               >
                 <ArrowUpRight className="w-5 h-5" />
@@ -89,22 +105,22 @@ export default function EditorialShowcase() {
               className="flex flex-col sm:flex-row gap-8 items-center lg:items-start"
               style={{ y: y2 }}
             >
-              <Link href="/product/MI0017" className="group relative w-full sm:w-1/2 aspect-square overflow-hidden rounded-2xl border border-champagne-gold/20 shadow-2xl block">
+              <Link href={topRightLink} className="group relative w-full sm:w-1/2 aspect-square overflow-hidden rounded-2xl border border-champagne-gold/20 shadow-2xl block">
                 <Image
-                  src="/images/products/MI0017/MI0017-1.png"
-                  alt="Crystal Pear Ring"
+                  src={topRightImage}
+                  alt={topRightTitle}
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
               </Link>
               <div className="w-full sm:w-1/2 flex flex-col justify-center text-center sm:text-left mt-6 sm:mt-0">
                 <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-3 font-semibold">Premium Grade</p>
-                <Link href="/product/MI0017">
-                  <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors mb-4">Crystal Pear Ring</h3>
+                <Link href={topRightLink}>
+                  <h3 className="font-serif text-3xl text-warm-ivory hover:text-champagne-gold transition-colors mb-4">{topRightTitle}</h3>
                 </Link>
                 <p className="text-muted-text font-light text-sm mb-6">A delicate fusion of classic charm and modern brilliance, perfect for any occasion.</p>
                 <Link
-                  href="/product/MI0017"
+                  href={topRightLink}
                   className="inline-block text-xs uppercase tracking-widest text-champagne-gold hover:text-white border-b border-champagne-gold/30 hover:border-white pb-1 w-fit transition-colors"
                 >
                   Discover Piece
@@ -117,18 +133,18 @@ export default function EditorialShowcase() {
               className="relative self-end w-full sm:w-4/5 lg:w-3/4"
               style={{ y: y3 }}
             >
-              <Link href="/product/MI0022" className="group relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 block">
+              <Link href={bottomRightLink} className="group relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 block">
                 <Image
-                  src="/images/products/MI0022/MI0022-1 Coin.png"
-                  alt="Traditional Coin Necklace"
+                  src={bottomRightImage}
+                  alt={bottomRightTitle}
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 />
               </Link>
               <div className="absolute -bottom-10 left-0 sm:-left-10 lg:-left-20 bg-primary-bg p-8 rounded-tr-3xl border-t border-r border-white/5 shadow-2xl max-w-[80%]">
                 <p className="text-champagne-gold text-xs uppercase tracking-[0.2em] mb-2 font-semibold">Heritage Collection</p>
-                <Link href="/product/MI0022">
-                  <h3 className="font-serif text-2xl lg:text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">Traditional Coin Necklace</h3>
+                <Link href={bottomRightLink}>
+                  <h3 className="font-serif text-2xl lg:text-3xl text-warm-ivory hover:text-champagne-gold transition-colors">{bottomRightTitle}</h3>
                 </Link>
               </div>
             </motion.div>

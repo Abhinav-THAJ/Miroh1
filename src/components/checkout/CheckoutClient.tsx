@@ -9,6 +9,20 @@ import { useRouter } from "next/navigation";
 import { ShieldCheck, Lock, CheckCircle2, User, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    if (typeof window !== "undefined" && (window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export default function CheckoutClient() {
   const { items, clearCart } = useCartStore();
   const { isAuthenticated, user, checkSession } = useAuthStore();
@@ -127,35 +141,122 @@ export default function CheckoutClient() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: items,
-          customer_id: user?.id,
-          contact: { email: formData.email, phone: formData.phone },
-          shipping: {
-            fullName: formData.fullName,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zip: formData.zip,
-            country: formData.country,
+      if (formData.payment === "ONLINE" || formData.payment === "RAZORPAY") {
+        const resLoaded = await loadRazorpay();
+        if (!resLoaded) {
+          alert("Failed to load Razorpay SDK. Please check your internet connection.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // 1. Create Order via our Razorpay API Route
+        const rzpOrderRes = await fetch("/api/checkout/razorpay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: total }),
+        });
+        
+        if (!rzpOrderRes.ok) throw new Error("Failed to initialize payment");
+        const rzpOrder = await rzpOrderRes.json();
+
+        // 2. Configure and Open Razorpay Popup
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+          amount: rzpOrder.amount, 
+          currency: rzpOrder.currency,
+          name: "Miorah",
+          description: "Purchase from Miorah",
+          order_id: rzpOrder.id,
+          handler: async function (response: any) {
+            try {
+              // 3. Complete Order on backend
+              const submitRes = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  items: items,
+                  customer_id: user?.id,
+                  contact: { email: formData.email, phone: formData.phone },
+                  shipping: {
+                    fullName: formData.fullName,
+                    address: formData.address,
+                    city: formData.city,
+                    state: formData.state,
+                    zip: formData.zip,
+                    country: formData.country,
+                  },
+                  payment: formData.payment,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+              
+              if (!submitRes.ok) throw new Error("Failed to process order.");
+              
+              setOrderPlaced(true);
+              clearCart();
+            } catch (err) {
+              console.error(err);
+              alert("Payment successful but order creation failed. Please contact support.");
+            } finally {
+              setIsSubmitting(false);
+            }
           },
-          payment: formData.payment,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to process order.");
+          prefill: {
+            name: formData.fullName,
+            email: formData.email,
+            contact: formData.phone,
+          },
+          theme: {
+            color: "#D4AF37", // champagne-gold
+          },
+          modal: {
+            ondismiss: function() {
+              setIsSubmitting(false);
+            }
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on("payment.failed", function (response: any){
+          alert("Payment failed: " + response.error.description);
+          setIsSubmitting(false);
+        });
+        rzp.open();
+
+      } else {
+        // Offline payment method (like COD)
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: items,
+            customer_id: user?.id,
+            contact: { email: formData.email, phone: formData.phone },
+            shipping: {
+              fullName: formData.fullName,
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              zip: formData.zip,
+              country: formData.country,
+            },
+            payment: formData.payment,
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error("Failed to process order.");
+        }
+        
+        setOrderPlaced(true);
+        clearCart();
+        setIsSubmitting(false);
       }
-      
-      setOrderPlaced(true);
-      clearCart();
     } catch (error) {
       console.error(error);
       alert("There was an issue processing your order. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
