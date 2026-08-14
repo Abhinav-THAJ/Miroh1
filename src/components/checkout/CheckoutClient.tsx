@@ -132,6 +132,12 @@ export default function CheckoutClient() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // If not authenticated, redirect to login with return URL
+    if (!isAuthenticated) {
+      router.push("/account?redirect=/checkout");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {

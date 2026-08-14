@@ -35,8 +35,11 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Cookie: "wordpress_test_cookie=WP%20Cookie%20check",
-        "User-Agent": "Mozilla/5.0 (compatible; Miorah/1.0)",
+        "Cookie": "wordpress_test_cookie=WP%20Cookie%20check",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Origin": WC_BASE,
+        "Referer": `${WC_BASE}/wp-login.php`,
       },
       body: form.toString(),
       redirect: "manual",
