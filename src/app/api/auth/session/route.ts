@@ -9,25 +9,52 @@ export async function GET(request: NextRequest) {
     const cookie = request.cookies.get("auth_session")?.value;
 
     if (!cookie) {
-      return NextResponse.json({ authenticated: false, user: null });
+      return NextResponse.json(
+        { authenticated: false, user: null },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+          },
+        }
+      );
     }
 
     let payload: any;
     try {
       payload = JSON.parse(Buffer.from(cookie, "base64").toString("utf-8"));
     } catch {
-      const r = NextResponse.json({ authenticated: false, user: null });
+      const r = NextResponse.json(
+        { authenticated: false, user: null },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+          },
+        }
+      );
       r.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
       return r;
     }
 
     // Expired?
     if (!payload.ts || Date.now() - payload.ts > SESSION_MAX_AGE_MS) {
-      const r = NextResponse.json({
-        authenticated: false,
-        user: null,
-        reason: "session_expired",
-      });
+      const r = NextResponse.json(
+        {
+          authenticated: false,
+          user: null,
+          reason: "session_expired",
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+          },
+        }
+      );
       r.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
       return r;
     }
@@ -52,6 +79,12 @@ export async function GET(request: NextRequest) {
         lastName: payload.lastName || "",
         username: payload.username || "",
       },
+    }, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      }
     });
 
     response.cookies.set("auth_session", newToken, {
@@ -64,6 +97,15 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch {
-    return NextResponse.json({ authenticated: false, user: null });
+    return NextResponse.json(
+      { authenticated: false, user: null },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   }
 }
