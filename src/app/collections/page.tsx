@@ -59,14 +59,11 @@ export default function CollectionsPage() {
               plating: "High-Grade Finish",
               stone: "Grade AAA Cubic Zirconia",
               weight: "4.5 grams",
-              waterResistant: "Water Resistant",
-              antiTarnish: "100% Anti-Tarnish",
-              hypoallergenic: "Nickel-Free",
             },
             features: [
-              "Water & sweat-resistant",
-              "Anti-tarnish protective coating",
               "Includes Miorah gift box",
+              "Exclusive premium design",
+              "Handcrafted finish",
             ],
             inStock: true,
           };

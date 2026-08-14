@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
-const collections = [
+const collectionsFallback = [
   {
     id: "traditional",
     title: "Traditional",
@@ -33,8 +33,30 @@ const collections = [
   },
 ];
 
-export default function FeaturedCollections() {
+export default function FeaturedCollections({ acfData }: { acfData?: any }) {
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const heading = acfData?.heading || "Explore";
+  const headingItalic = acfData?.heading_italic || "Collections";
+
+  // Build collections array from ACF or fallback
+  const rawItems = acfData?.items;
+  const itemsArray = Array.isArray(rawItems)
+    ? rawItems
+    : (rawItems && typeof rawItems === 'object' ? Object.values(rawItems) : []);
+
+  const acfItems = itemsArray.length > 0 
+    ? itemsArray.filter((item: any) => item && (item.title || item.image)).map((item: any, idx: number) => ({
+        id: `acf-fc-${idx}`,
+        title: item.title,
+        subtitle: "", 
+        image: item.image?.url || item.image || collectionsFallback[0].image,
+        productLink: item.link || "/collections",
+        description: item.description,
+      }))
+    : [];
+
+  const displayCollections = acfItems.length > 0 ? acfItems : collectionsFallback;
 
   return (
     <section className="py-20 md:py-32 bg-primary-bg relative border-t border-white/5">
@@ -47,7 +69,7 @@ export default function FeaturedCollections() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Explore <span className="italic font-light text-champagne-gold">Collections</span>
+            {heading} <span className="italic font-light text-champagne-gold">{headingItalic}</span>
           </motion.h2>
         </div>
 
@@ -55,7 +77,7 @@ export default function FeaturedCollections() {
           
           {/* Left Side: Interactive List */}
           <div className="w-full lg:w-1/2 flex flex-col gap-4 md:gap-8">
-            {collections.map((collection, index) => {
+            {displayCollections.map((collection, index) => {
               const isActive = activeIndex === index;
               return (
                 <div 
@@ -113,7 +135,7 @@ export default function FeaturedCollections() {
 
           {/* Right Side: Image Reveal */}
           <Link
-            href={collections[activeIndex].productLink}
+            href={displayCollections[activeIndex].productLink}
             className="w-full lg:w-1/2 relative h-[380px] sm:h-[500px] md:h-[600px] lg:h-[750px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 mt-6 lg:mt-0 block group cursor-pointer"
           >
             <AnimatePresence mode="wait">
@@ -126,8 +148,8 @@ export default function FeaturedCollections() {
                 className="absolute inset-0"
               >
                 <Image
-                  src={collections[activeIndex].image}
-                  alt={collections[activeIndex].title}
+                  src={displayCollections[activeIndex].image}
+                  alt={displayCollections[activeIndex].title}
                   fill
                   className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                   priority

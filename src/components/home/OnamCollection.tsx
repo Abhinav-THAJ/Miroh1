@@ -11,8 +11,9 @@ export default function OnamCollection({ acfData }: { acfData?: any }) {
   
   if (!isVisible) return null;
 
+  const campaignName = acfData?.campaign_name || "Onam";
   const badgeText = acfData?.badge_text || "Seasonal Exclusive";
-  const heading = acfData?.heading || "The <span class=\"italic text-champagne-gold font-light\">Onam</span> Collection";
+  const heading = acfData?.heading || `The <span class="italic text-champagne-gold font-light">${campaignName}</span> Collection`;
   const description = acfData?.description || "Celebrate the festive season with our exclusive traditional designs. Elegance curated for your grand celebrations.";
   const linkUrl = acfData?.link || "/collections";
   const imageUrl = acfData?.image || "/images/products/MI0041/MI0041-1.png";
@@ -68,22 +69,23 @@ export default function OnamCollection({ acfData }: { acfData?: any }) {
                 href={linkUrl}
                 className="flex items-center gap-3 bg-champagne-gold text-primary-bg px-8 py-4 rounded-full font-medium tracking-wide hover:bg-white transition-colors w-fit group"
               >
-                Shop Onam Collection
+                Shop {campaignName} Collection
                 <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform" />
               </Link>
             </motion.div>
           </div>
 
-          <Link href={linkUrl} className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block group">
+          {/* Banner Image - non clickable as requested */}
+          <div className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-[700px] block">
             <Image
               src={imageUrl}
-              alt="Onam Collection"
+              alt={`${campaignName} Collection`}
               fill
               className="object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-gradient-brown via-transparent to-transparent hidden lg:block" />
             <div className="absolute inset-0 bg-gradient-to-t from-gradient-brown via-transparent to-transparent lg:hidden" />
-          </Link>
+          </div>
 
         </div>
       </div>

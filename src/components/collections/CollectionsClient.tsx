@@ -20,9 +20,12 @@ export default function CollectionsClient({
   categories,
   initialCategory = "all",
 }: CollectionsClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
-  const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "newest">("featured");
   const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  const initialCat = categoryParam || initialCategory;
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
+  const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "newest">("featured");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [addedCartId, setAddedCartId] = useState<string | number | null>(null);
@@ -91,11 +94,8 @@ export default function CollectionsClient({
                 plating: "High-Grade Finish",
                 stone: "Grade AAA Cubic Zirconia",
                 weight: "4.5 grams",
-                waterResistant: "Water Resistant",
-                antiTarnish: "100% Anti-Tarnish",
-                hypoallergenic: "Nickel-Free",
               },
-              features: ["High-Grade Finish", "100% Anti-tarnish"],
+              features: ["High-Grade Finish", "Exclusive design"],
               inStock: true,
             });
           });
@@ -169,9 +169,10 @@ export default function CollectionsClient({
         // Category Filter
         if (selectedCategory !== "all") {
           const cat = product.category || "";
-          const matchWcCategory = cat.toLowerCase() === selectedCategory.toLowerCase();
-          const matchSlug = selectedCategory.toLowerCase().includes(cat.toLowerCase());
-          if (!matchWcCategory && !matchSlug) return false;
+          const slugifiedCat = cat.toLowerCase().replace(/\s+/g, '-');
+          if (slugifiedCat !== selectedCategory.toLowerCase() && cat.toLowerCase() !== selectedCategory.toLowerCase()) {
+            return false;
+          }
         }
         // Search Query Filter
         if (searchQuery.trim() !== "") {
@@ -179,7 +180,8 @@ export default function CollectionsClient({
           const nameMatch = product.name?.toLowerCase().includes(query) || false;
           const catMatch = product.category?.toLowerCase().includes(query) || false;
           const descMatch = product.shortDescription?.toLowerCase().includes(query) || false;
-          if (!nameMatch && !catMatch && !descMatch) return false;
+          const idMatch = String(product.id).toLowerCase().includes(query) || product.sku?.toLowerCase().includes(query) || false;
+          if (!nameMatch && !catMatch && !descMatch && !idMatch) return false;
         }
         return true;
       })
@@ -213,31 +215,33 @@ export default function CollectionsClient({
       <div className="mb-12 space-y-6">
         
         {/* Category Pills */}
-        <div className="flex items-center gap-3 overflow-x-auto scrollbar-none pb-2 pt-1">
-          {validCategories.map((cat) => {
-            const isActive = selectedCategory.toLowerCase() === String(cat.slug || cat.id).toLowerCase();
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(String(cat.slug || cat.id))}
-                className={`px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold transition-all flex items-center gap-2 flex-shrink-0 ${
-                  isActive
-                    ? "bg-champagne-gold text-luxury-black shadow-lg scale-105"
-                    : "bg-white/5 border border-white/10 text-warm-ivory/80 hover:border-champagne-gold/40 hover:text-warm-ivory"
-                }`}
-              >
-                <span>{cat.name}</span>
-                {cat.count !== undefined && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                    isActive ? "bg-luxury-black/20 text-luxury-black" : "bg-white/10 text-muted-text"
-                  }`}>
-                    {cat.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {!categoryParam && (
+          <div className="flex items-center gap-3 overflow-x-auto scrollbar-none pb-2 pt-1">
+            {validCategories.map((cat) => {
+              const isActive = selectedCategory.toLowerCase() === String(cat.slug || cat.id).toLowerCase();
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(String(cat.slug || cat.id))}
+                  className={`px-5 py-2.5 rounded-full text-xs uppercase tracking-widest font-semibold transition-all flex items-center gap-2 flex-shrink-0 ${
+                    isActive
+                      ? "bg-champagne-gold text-luxury-black shadow-lg scale-105"
+                      : "bg-white/5 border border-white/10 text-warm-ivory/80 hover:border-champagne-gold/40 hover:text-warm-ivory"
+                  }`}
+                >
+                  <span>{cat.name}</span>
+                  {cat.count !== undefined && (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      isActive ? "bg-luxury-black/20 text-luxury-black" : "bg-white/10 text-muted-text"
+                    }`}>
+                      {cat.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Search Input & Sort Dropdown */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">

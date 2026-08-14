@@ -38,7 +38,9 @@ export default function Navbar() {
     : ALL_PRODUCTS.filter(p => 
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
         p.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
+        p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        String(p.id).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
       ).slice(0, 4);
 
   const handleSearchSubmit = (e: React.FormEvent) => {

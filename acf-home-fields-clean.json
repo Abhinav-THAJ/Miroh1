@@ -1,0 +1,336 @@
+[
+  {
+    "key": "group_home_page_hero",
+    "title": "Home Page Settings",
+    "fields": [
+      {
+        "key": "field_hero_group",
+        "label": "Hero Section",
+        "name": "hero",
+        "type": "group",
+        "sub_fields": [
+          {
+            "key": "field_hero_badge_text",
+            "label": "Badge Text",
+            "name": "badge_text",
+            "type": "text",
+            "instructions": "e.g. 1-Year Anniversary Offer. Leave blank to hide the badge.",
+            "default_value": "1-Year Anniversary Offer"
+          },
+          {
+            "key": "field_hero_heading",
+            "label": "Heading (line 1)",
+            "name": "heading",
+            "type": "text",
+            "default_value": "Unleash the"
+          },
+          {
+            "key": "field_hero_heading_italic",
+            "label": "Heading Italic (line 2 - gold italic)",
+            "name": "heading_italic",
+            "type": "text",
+            "default_value": "shining beauty"
+          },
+          {
+            "key": "field_hero_description",
+            "label": "Description",
+            "name": "description",
+            "type": "textarea",
+            "rows": 3,
+            "default_value": "Celebrate our 1st Anniversary with exclusive offers! Miorah brings you handcrafted luxury imitation jewellery engineered to capture eternal radiance."
+          },
+          {
+            "key": "field_hero_primary_btn_text",
+            "label": "Primary Button Text",
+            "name": "primary_button_text",
+            "type": "text",
+            "default_value": "Shop Now"
+          },
+          {
+            "key": "field_hero_primary_btn_link",
+            "label": "Primary Button Link",
+            "name": "primary_button_link",
+            "type": "text",
+            "default_value": "/collections"
+          },
+          {
+            "key": "field_hero_secondary_btn_text",
+            "label": "Secondary Button Text",
+            "name": "secondary_button_text",
+            "type": "text",
+            "default_value": "Explore New Arrivals"
+          },
+          {
+            "key": "field_hero_secondary_btn_link",
+            "label": "Secondary Button Link",
+            "name": "secondary_button_link",
+            "type": "text",
+            "default_value": "/new-arrivals"
+          },
+          {
+            "key": "field_hero_slides",
+            "label": "Product Slides (Carousel)",
+            "name": "slides",
+            "type": "repeater",
+            "instructions": "Add up to 4 slides. Each slide is a product shown in the right carousel.",
+            "min": 0,
+            "max": 4,
+            "button_label": "Add Slide",
+            "sub_fields": [
+              {
+                "key": "field_hero_slide_image",
+                "label": "Product Image",
+                "name": "image",
+                "type": "image",
+                "return_format": "array",
+                "preview_size": "medium"
+              },
+              {
+                "key": "field_hero_slide_badge",
+                "label": "Badge (top-right label)",
+                "name": "badge",
+                "type": "text",
+                "instructions": "e.g. Bestseller, New Arrival, Exclusive, Limited Edition",
+                "default_value": "Exclusive"
+              },
+              {
+                "key": "field_hero_slide_tag",
+                "label": "Tag (small gold label)",
+                "name": "tag",
+                "type": "text",
+                "instructions": "e.g. HERITAGE COLLECTION",
+                "default_value": "MIORAH EXCLUSIVE"
+              },
+              {
+                "key": "field_hero_slide_title",
+                "label": "Product Title",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "key": "field_hero_slide_subtitle",
+                "label": "Product Subtitle",
+                "name": "subtitle",
+                "type": "text"
+              },
+              {
+                "key": "field_hero_slide_price",
+                "label": "Price (e.g. ₹3,400)",
+                "name": "price",
+                "type": "text"
+              },
+              {
+                "key": "field_hero_slide_link",
+                "label": "Product Link (e.g. /product/my-product)",
+                "name": "link",
+                "type": "text",
+                "default_value": "/collections"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "field_editorial_showcase",
+        "label": "Editorial Showcase",
+        "name": "editorial_showcase",
+        "type": "group",
+        "sub_fields": [
+          {
+            "key": "field_editorial_heading",
+            "label": "Heading",
+            "name": "heading",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_subheading",
+            "label": "Subheading (gold italic prefix)",
+            "name": "subheading",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_description",
+            "label": "Description",
+            "name": "description",
+            "type": "textarea"
+          },
+          {
+            "key": "field_editorial_left_image",
+            "label": "Left Image URL",
+            "name": "left_image",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_left_title",
+            "label": "Left Title",
+            "name": "left_title",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_left_link",
+            "label": "Left Link",
+            "name": "left_link",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_top_right_image",
+            "label": "Top Right Image URL",
+            "name": "top_right_image",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_top_right_title",
+            "label": "Top Right Title",
+            "name": "top_right_title",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_top_right_link",
+            "label": "Top Right Link",
+            "name": "top_right_link",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_bottom_right_image",
+            "label": "Bottom Right Image URL",
+            "name": "bottom_right_image",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_bottom_right_title",
+            "label": "Bottom Right Title",
+            "name": "bottom_right_title",
+            "type": "text"
+          },
+          {
+            "key": "field_editorial_bottom_right_link",
+            "label": "Bottom Right Link",
+            "name": "bottom_right_link",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "key": "field_onam_collection",
+        "label": "Onam Collection",
+        "name": "onam_collection",
+        "type": "group",
+        "sub_fields": [
+          {
+            "key": "field_onam_is_visible",
+            "label": "Show Section?",
+            "name": "is_visible",
+            "type": "true_false",
+            "default_value": 1
+          },
+          {
+            "key": "field_onam_badge_text",
+            "label": "Badge Text",
+            "name": "badge_text",
+            "type": "text",
+            "default_value": "Seasonal Exclusive"
+          },
+          {
+            "key": "field_onam_heading",
+            "label": "Heading",
+            "name": "heading",
+            "type": "text"
+          },
+          {
+            "key": "field_onam_description",
+            "label": "Description",
+            "name": "description",
+            "type": "textarea"
+          },
+          {
+            "key": "field_onam_image",
+            "label": "Banner Image URL",
+            "name": "image",
+            "type": "text"
+          },
+          {
+            "key": "field_onam_link",
+            "label": "Shop Button Link",
+            "name": "link",
+            "type": "text",
+            "default_value": "/collections"
+          }
+        ]
+      },
+      {
+        "key": "field_featured_collections_group",
+        "label": "Featured Collections",
+        "name": "featured_collections",
+        "type": "group",
+        "sub_fields": [
+          {
+            "key": "field_fc_heading",
+            "label": "Heading",
+            "name": "heading",
+            "type": "text",
+            "default_value": "Explore"
+          },
+          {
+            "key": "field_fc_heading_italic",
+            "label": "Heading (Italic part)",
+            "name": "heading_italic",
+            "type": "text",
+            "default_value": "Collections"
+          },
+          {
+            "key": "field_fc_items",
+            "label": "Collections Items",
+            "name": "items",
+            "type": "repeater",
+            "min": 0,
+            "max": 4,
+            "sub_fields": [
+              {
+                "key": "field_fci_title",
+                "label": "Title",
+                "name": "title",
+                "type": "text"
+              },
+              {
+                "key": "field_fci_description",
+                "label": "Description",
+                "name": "description",
+                "type": "textarea"
+              },
+              {
+                "key": "field_fci_image",
+                "label": "Image URL",
+                "name": "image",
+                "type": "text"
+              },
+              {
+                "key": "field_fci_link",
+                "label": "Collection Link",
+                "name": "link",
+                "type": "text",
+                "default_value": "/collections"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "location": [
+      [
+        {
+          "param": "page_type",
+          "operator": "==",
+          "value": "front_page"
+        }
+      ]
+    ],
+    "active": true,
+    "show_in_rest": true,
+    "menu_order": 0,
+    "position": "normal",
+    "style": "seamless",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": ""
+  }
+]

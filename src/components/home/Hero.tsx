@@ -32,7 +32,7 @@ const HERO_SLIDES = [
     id: "M0033",
     tag: "HAUTE JOAILLERIE",
     title: "Crown Solitaire Set",
-    subtitle: "Anti-Tarnish Precision Cut Crystals & Gold Plating",
+    subtitle: "Premium Precision Cut Crystals & Gold Plating",
     price: "₹3,100",
     image: "/images/products/M0033/MI0033-1.png",
     link: "/collections",
@@ -59,7 +59,7 @@ const SPARKLES_DATA = [
   { top: "40%", left: "48%", size: 2, delay: 1.2 },
 ];
 
-export default function Hero({ acfData }: { acfData?: any }) {
+export default function Hero({ acfData, bestSellers }: { acfData?: any, bestSellers?: any[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,7 +73,47 @@ export default function Hero({ acfData }: { acfData?: any }) {
   const yImage = useTransform(scrollYProgress, [0, 1], [0, 80]);
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
 
-  const slides = acfData && acfData.length > 0 ? acfData : HERO_SLIDES;
+  // ── ACF content fields ───────────────────────────────────────────────────────
+  const badgeText        = acfData?.badge_text         || "1-Year Anniversary Offer";
+  const heading          = acfData?.heading            || "Unleash the";
+  const headingItalic    = acfData?.heading_italic     || "shining beauty";
+  const description      = acfData?.description        || "Celebrate our 1st Anniversary with exclusive offers! Miorah brings you handcrafted luxury imitation jewellery engineered to capture eternal radiance.";
+  const primaryBtnText   = acfData?.primary_button_text   || "Shop Now";
+  const primaryBtnLink   = acfData?.primary_button_link   || "/collections";
+  const secondaryBtnText = acfData?.secondary_button_text || "Explore New Arrivals";
+  const secondaryBtnLink = acfData?.secondary_button_link || "/new-arrivals";
+
+  // ── ACF slides — fall back to WooCommerce best-sellers, then static defaults ─
+  const rawSlides = acfData?.slides;
+  const slidesArray = Array.isArray(rawSlides) 
+    ? rawSlides 
+    : (rawSlides && typeof rawSlides === 'object' ? Object.values(rawSlides) : []);
+
+  const acfSlides: any[] = slidesArray.length > 0
+    ? slidesArray.filter((s: any) => s && (s.title || s.image)).map((s: any, idx: number) => ({
+        id: `acf-${idx}`,
+        tag:    s.tag    || "MIORAH EXCLUSIVE",
+        title:  s.title  || "",
+        subtitle: s.subtitle || "",
+        price:  s.price  || "",
+        image:  s.image?.url || s.image || "/images/products/MI0035/MI0035-1.png",
+        link:   s.link   || "/collections",
+        badge:  s.badge  || "Exclusive",
+      }))
+    : [];
+
+  const wcSlides = bestSellers?.slice(0, 4).map((p, idx) => ({
+    id: p.id,
+    tag: p.category || "MIORAH EXCLUSIVE",
+    title: p.name,
+    subtitle: p.shortDescription || "Show-Stopping Statement Suite Crafted for Unforgettable Moments",
+    price: p.price,
+    image: p.image1,
+    link: `/product/${p.slug || p.id}`,
+    badge: idx === 0 ? "Bestseller" : idx === 1 ? "New Arrival" : idx === 2 ? "Exclusive" : "Limited Edition",
+  }));
+
+  const slides = acfSlides.length > 0 ? acfSlides : (wcSlides && wcSlides.length > 0 ? wcSlides : HERO_SLIDES);
   const activeSlide = slides[currentSlide] || slides[0];
 
   // Auto-play luxury showcase slide carousel
@@ -147,53 +187,51 @@ export default function Hero({ acfData }: { acfData?: any }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Eye-catching Anniversary Offer */}
-            <motion.div 
-              className="relative flex items-center justify-center lg:justify-start mb-6 sm:mb-8 w-full lg:w-fit mx-auto lg:mx-0"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-            >
-              {/* Glowing Background Blur */}
-              <div className="absolute inset-0 bg-champagne-gold/30 blur-[20px] rounded-full animate-pulse duration-[3000ms]" />
-              
-              {/* Content */}
-              <div className="relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-champagne-gold/50 bg-luxury-brown/80 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
-                <span className="text-champagne-gold font-bold uppercase tracking-[0.15em] sm:tracking-[0.3em] text-[9px] sm:text-xs drop-shadow-sm text-center whitespace-nowrap">
-                  1-Year Anniversary <span className="text-white">Offer</span>
-                </span>
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
-              </div>
-            </motion.div>
+            {/* Badge — editable from ACF: hero > badge_text */}
+            {badgeText && (
+              <motion.div 
+                className="relative flex items-center justify-center lg:justify-start mb-6 sm:mb-8 w-full lg:w-fit mx-auto lg:mx-0"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+              >
+                <div className="absolute inset-0 bg-champagne-gold/30 blur-[20px] rounded-full animate-pulse duration-[3000ms]" />
+                <div className="relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-champagne-gold/50 bg-luxury-brown/80 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
+                  <span className="text-champagne-gold font-bold uppercase tracking-[0.15em] sm:tracking-[0.3em] text-[9px] sm:text-xs drop-shadow-sm text-center whitespace-nowrap">
+                    {badgeText}
+                  </span>
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-champagne-gold animate-pulse" />
+                </div>
+              </motion.div>
+            )}
             
-            {/* Main Headline */}
+            {/* Heading — editable from ACF: hero > heading + hero > heading_italic */}
             <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-[1.08] text-warm-ivory mb-6 tracking-tight">
-              Unleash the <br className="hidden sm:block" />
-              <span className="italic font-light text-gradient-gold drop-shadow-sm">shining beauty</span>
+              {heading} <br className="hidden sm:block" />
+              <span className="italic font-light text-gradient-gold drop-shadow-sm">{headingItalic}</span>
             </h1>
             
-            {/* Editorial Subtitle */}
+            {/* Description — editable from ACF: hero > description */}
             <p className="text-muted-text text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-8 font-light leading-relaxed">
-              Celebrate our 1st Anniversary with exclusive offers! Miorah brings you handcrafted luxury imitation jewellery engineered to capture eternal radiance.
+              {description}
             </p>
 
-
-            {/* Call to Actions */}
+            {/* CTAs — editable from ACF: hero > primary/secondary button text + link */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6">
               <Link
-                href="/collections"
+                href={primaryBtnLink}
                 className="group relative inline-flex items-center justify-center gap-3 bg-champagne-gold text-primary-bg px-9 py-4 rounded-full font-medium tracking-wider uppercase text-xs sm:text-sm hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-300 w-full sm:w-auto"
               >
-                Shop Now
+                {primaryBtnText}
                 <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform duration-300" />
               </Link>
               
               <Link
-                href="/new-arrivals"
+                href={secondaryBtnLink}
                 className="group inline-flex items-center gap-2 text-warm-ivory hover:text-champagne-gold border-b border-warm-ivory/30 hover:border-champagne-gold pb-1.5 transition-all duration-300 uppercase tracking-widest text-xs sm:text-sm font-medium"
               >
-                Explore New Arrivals
+                {secondaryBtnText}
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
