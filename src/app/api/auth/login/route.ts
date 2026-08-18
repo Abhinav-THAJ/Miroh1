@@ -12,14 +12,32 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /**
  * verifyWpPassword
- * Strategy 1 (PRIMARY): JWT Authentication plugin → /wp-json/jwt-auth/v1/token
- *   - Most reliable from Vercel serverless, never blocked by Hostinger firewall
- *   - Accepts username OR email + password, returns 200 on success / 403 on failure
- * Strategy 2: WP REST API Basic Auth → /wp/v2/users/me
+ * Strategy 1 (PRIMARY): Custom WP REST endpoint /wp-json/miorah/v1/verify
+ *   - Uses WordPress native wp_check_password() — 100% reliable, never blocked
+ * Strategy 2: JWT Authentication plugin → /wp-json/jwt-auth/v1/token
  * Strategy 3: wp-login.php form POST → final fallback
  */
 async function verifyWpPassword(loginField: string, password: string): Promise<boolean> {
-  // ── Strategy 1: JWT Authentication Plugin ──────────────────────────────
+  // ── Strategy 1: Custom WordPress REST endpoint (most reliable) ────────────
+  try {
+    const res = await fetch(`${WC_BASE}/wp-json/miorah/v1/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Miorah-Secret": "miorahverify2024xK9m",
+      },
+      body: JSON.stringify({ email: loginField, password }),
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) return true;
+    }
+    // 404 = no account found (not a password error), 401 = wrong password
+    // Either way, fall through to next strategy
+  } catch { /* fall through */ }
+
+  // ── Strategy 2: JWT Authentication Plugin ────────────────────────────────
   try {
     const res = await fetch(`${WC_BASE}/wp-json/jwt-auth/v1/token`, {
       method: "POST",
@@ -33,23 +51,7 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
     }
   } catch { /* fall through */ }
 
-  // ── Strategy 2: WP REST API Basic Auth ─────────────────────────────────
-  try {
-    const credentials = Buffer.from(`${loginField}:${password}`).toString("base64");
-    const res = await fetch(`${WC_BASE}/wp-json/wp/v2/users/me`, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${credentials}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
-    if (res.ok) return true;
-  } catch { /* fall through */ }
-
-  // ── Strategy 3: wp-login.php form POST ─────────────────────────────────
-  // SUCCESS → HTTP 302 (WP redirects away from the login page)
-  // FAILURE → HTTP 200 (WP re-renders the login form with an error)
+  // ── Strategy 3: wp-login.php form POST ───────────────────────────────────
   try {
     const form = new URLSearchParams({
       log: loginField,
@@ -58,26 +60,24 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
       redirect_to: "/",
       testcookie: "1",
     });
-
     const res = await fetch(`${WC_BASE}/wp-login.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": "wordpress_test_cookie=WP%20Cookie%20check",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "Origin": WC_BASE,
         "Referer": `${WC_BASE}/wp-login.php`,
       },
       body: form.toString(),
       redirect: "manual",
     });
-
     return res.status === 302;
   } catch {
     return false;
   }
 }
+
 
 /** Look up a WooCommerce customer by email */
 async function getWcCustomerByEmail(email: string) {
