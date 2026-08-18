@@ -12,12 +12,28 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /**
  * verifyWpPassword
- * Strategy 1: WordPress REST API Basic Auth → works with Application Passwords
- *             or when Basic Auth is enabled (most reliable on Vercel serverless).
- * Strategy 2: wp-login.php form POST → fallback; checks for 302 redirect.
+ * Strategy 1 (PRIMARY): JWT Authentication plugin → /wp-json/jwt-auth/v1/token
+ *   - Most reliable from Vercel serverless, never blocked by Hostinger firewall
+ *   - Accepts username OR email + password, returns 200 on success / 403 on failure
+ * Strategy 2: WP REST API Basic Auth → /wp/v2/users/me
+ * Strategy 3: wp-login.php form POST → final fallback
  */
 async function verifyWpPassword(loginField: string, password: string): Promise<boolean> {
-  // ── Strategy 1: WP REST API /wp/v2/users/me with Basic Auth ────────────
+  // ── Strategy 1: JWT Authentication Plugin ──────────────────────────────
+  try {
+    const res = await fetch(`${WC_BASE}/wp-json/jwt-auth/v1/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: loginField, password }),
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.token) return true;
+    }
+  } catch { /* fall through */ }
+
+  // ── Strategy 2: WP REST API Basic Auth ─────────────────────────────────
   try {
     const credentials = Buffer.from(`${loginField}:${password}`).toString("base64");
     const res = await fetch(`${WC_BASE}/wp-json/wp/v2/users/me`, {
@@ -31,7 +47,7 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
     if (res.ok) return true;
   } catch { /* fall through */ }
 
-  // ── Strategy 2: wp-login.php form POST ─────────────────────────────────
+  // ── Strategy 3: wp-login.php form POST ─────────────────────────────────
   // SUCCESS → HTTP 302 (WP redirects away from the login page)
   // FAILURE → HTTP 200 (WP re-renders the login form with an error)
   try {
