@@ -2,9 +2,8 @@ const WP_URL = (process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-4928
 
 export async function getHomePageData() {
   try {
-    const timestamp = new Date().getTime();
-    const res = await fetch(`${WP_URL}/wp-json/wp/v2/pages?slug=home&_embed&t=${timestamp}`, {
-      cache: 'no-store'
+    const res = await fetch(`${WP_URL}/wp-json/wp/v2/pages?slug=home&_embed`, {
+      next: { revalidate: 300 }, // Revalidate every 5 minutes
     });
     if (!res.ok) return null;
     const data = await res.json();

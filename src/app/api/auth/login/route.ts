@@ -10,18 +10,30 @@ const WC_AUTH = `Basic ${Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString("base64"
 
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-/** ─────────────────────────────────────────────────────────────────
+/**
  * verifyWpPassword
- * Uses wp-login.php form POST with redirect:manual.
- * SUCCESS → HTTP 302 (WP redirects away from the login page)
- * FAILURE → HTTP 200 (WP re-renders the login form with an error)
- *
- * IMPORTANT: We do NOT check the Location header.
- * Admins     → redirect to /wp-admin/
- * Customers  → redirect to /  (or the redirect_to param)
- * Both are 302. Only 200 means wrong password.
- * ─────────────────────────────────────────────────────────────────*/
+ * Strategy 1: WordPress REST API Basic Auth → works with Application Passwords
+ *             or when Basic Auth is enabled (most reliable on Vercel serverless).
+ * Strategy 2: wp-login.php form POST → fallback; checks for 302 redirect.
+ */
 async function verifyWpPassword(loginField: string, password: string): Promise<boolean> {
+  // ── Strategy 1: WP REST API /wp/v2/users/me with Basic Auth ────────────
+  try {
+    const credentials = Buffer.from(`${loginField}:${password}`).toString("base64");
+    const res = await fetch(`${WC_BASE}/wp-json/wp/v2/users/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+    if (res.ok) return true;
+  } catch { /* fall through */ }
+
+  // ── Strategy 2: wp-login.php form POST ─────────────────────────────────
+  // SUCCESS → HTTP 302 (WP redirects away from the login page)
+  // FAILURE → HTTP 200 (WP re-renders the login form with an error)
   try {
     const form = new URLSearchParams({
       log: loginField,
@@ -56,7 +68,7 @@ async function getWcCustomerByEmail(email: string) {
   try {
     const res = await fetch(
       `${WC_BASE}/wp-json/wc/v3/customers?email=${encodeURIComponent(email)}&context=edit`,
-      { headers: { Authorization: WC_AUTH } }
+      { headers: { Authorization: WC_AUTH }, cache: "no-store" }
     );
     if (!res.ok) return null;
     const list = await res.json();
@@ -71,7 +83,7 @@ async function getWcCustomerByUsername(username: string) {
   try {
     const res = await fetch(
       `${WC_BASE}/wp-json/wc/v3/customers?search=${encodeURIComponent(username)}&context=edit`,
-      { headers: { Authorization: WC_AUTH } }
+      { headers: { Authorization: WC_AUTH }, cache: "no-store" }
     );
     if (!res.ok) return null;
     const list = await res.json();
@@ -87,7 +99,7 @@ async function getFullWcCustomer(id: number) {
   try {
     const res = await fetch(
       `${WC_BASE}/wp-json/wc/v3/customers/${id}?context=edit`,
-      { headers: { Authorization: WC_AUTH } }
+      { headers: { Authorization: WC_AUTH }, cache: "no-store" }
     );
     if (!res.ok) return null;
     return await res.json();
@@ -191,21 +203,27 @@ export async function POST(request: NextRequest) {
       try {
         const wpRes = await fetch(
           `${WC_BASE}/wp-json/wp/v2/users?search=${encodeURIComponent(searchTerm)}&context=view`,
-          { headers: { Authorization: WC_AUTH } }
+          { headers: { Authorization: WC_AUTH }, cache: "no-store" }
         );
         if (wpRes.ok) {
           const users = await wpRes.json();
-          if (Array.isArray(users)) {
-            wpUser = users.find((u: any) => {
-              if (email) {
-                return (
+          if (Array.isArray(users) && users.length > 0) {
+            if (email) {
+              // Match by name or slug derived from email prefix
+              wpUser = users.find(
+                (u: any) =>
                   u.name?.toLowerCase() === email.toLowerCase() ||
-                  u.slug === email.replace(/[@.]/g, "-").toLowerCase() ||
-                  u.slug === email.split("@")[0].replace(/[^a-z0-9]/gi, "").toLowerCase()
-                );
-              }
-              return u.slug?.toLowerCase() === loginUsername?.toLowerCase();
-            });
+                  u.slug?.toLowerCase() ===
+                    email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "")
+              );
+              // If still not found but only 1 result, take it
+              if (!wpUser && users.length === 1) wpUser = users[0];
+            } else {
+              wpUser =
+                users.find(
+                  (u: any) => u.slug?.toLowerCase() === loginUsername?.toLowerCase()
+                ) || users[0];
+            }
           }
         }
       } catch { /* fall through */ }
