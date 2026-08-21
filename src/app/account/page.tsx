@@ -1361,9 +1361,16 @@ function AccountPageContent() {
     );
   }
 
+  const handleAuthSuccess = useCallback(async () => {
+    // Re-check the session so the store reads the newly-set cookie
+    // and flips isAuthenticated → true, revealing the Dashboard.
+    await checkSession();
+    setSessionChecked(true);
+  }, [checkSession]);
+
   return isAuthenticated
     ? <Dashboard />
-    : <AuthPanel onSuccess={() => setSessionChecked(true)} redirectUrl={redirectUrl} />;
+    : <AuthPanel onSuccess={handleAuthSuccess} redirectUrl={redirectUrl} />;
 }
 
 export default function AccountPage() {

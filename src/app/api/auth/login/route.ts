@@ -31,11 +31,20 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
     });
     if (res.ok) {
       const data = await res.json();
-      if (data.success) return true;
+      if (data.success) {
+        console.log("[Auth] Strategy 1 (custom endpoint) succeeded for:", loginField);
+        return true;
+      }
+      // Explicit 401 = wrong password — don't fall through to other strategies
+      if (res.status === 401) {
+        console.log("[Auth] Strategy 1 returned 401 (wrong password) for:", loginField);
+        return false;
+      }
     }
-    // 404 = no account found (not a password error), 401 = wrong password
-    // Either way, fall through to next strategy
-  } catch { /* fall through */ }
+    console.log("[Auth] Strategy 1 failed with status:", res.status, "- falling through");
+  } catch (e) {
+    console.error("[Auth] Strategy 1 error:", e);
+  }
 
   // ── Strategy 2: JWT Authentication Plugin ────────────────────────────────
   try {
@@ -45,19 +54,32 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
       body: JSON.stringify({ username: loginField, password }),
       cache: "no-store",
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.token) return true;
+    const data = await res.json();
+    if (res.ok && data.token) {
+      console.log("[Auth] Strategy 2 (JWT) succeeded for:", loginField);
+      return true;
     }
-  } catch { /* fall through */ }
+    // JWT returns 403 for wrong password — don't fall through
+    if (res.status === 403 || (data.code && data.code.includes("incorrect_password"))) {
+      console.log("[Auth] Strategy 2 (JWT) returned wrong password for:", loginField);
+      return false;
+    }
+    console.log("[Auth] Strategy 2 (JWT) failed with status:", res.status, data.code, "- falling through");
+  } catch (e) {
+    console.error("[Auth] Strategy 2 (JWT) error:", e);
+  }
 
   // ── Strategy 3: wp-login.php form POST ───────────────────────────────────
+  // WordPress returns 302 on BOTH success and failure:
+  //   Success → redirects to wp-admin or the redirect_to URL
+  //   Failure → redirects back to wp-login.php?error=...  
+  // We distinguish by checking the Location header.
   try {
     const form = new URLSearchParams({
       log: loginField,
       pwd: password,
       "wp-submit": "Log In",
-      redirect_to: "/",
+      redirect_to: "/wp-admin/",
       testcookie: "1",
     });
     const res = await fetch(`${WC_BASE}/wp-login.php`, {
@@ -72,8 +94,14 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
       body: form.toString(),
       redirect: "manual",
     });
-    return res.status === 302;
-  } catch {
+    const location = res.headers.get("location") || "";
+    // Success: redirects to wp-admin or a non-login URL
+    // Failure: redirects back to wp-login.php (with ?error or ?loggedout)
+    const isSuccess = res.status === 302 && !location.includes("wp-login.php");
+    console.log("[Auth] Strategy 3 (wp-login.php):", res.status, "location:", location, "success:", isSuccess);
+    return isSuccess;
+  } catch (e) {
+    console.error("[Auth] Strategy 3 (wp-login.php) error:", e);
     return false;
   }
 }
@@ -204,9 +232,11 @@ export async function POST(request: NextRequest) {
       }
       customer = await getWcCustomerByEmail(email);
       loginField = email; // WordPress accepts email as login field since v4.5
+      console.log("[Login] Customer by email:", customer ? `found id=${customer.id}` : "not found");
     } else {
       customer = await getWcCustomerByUsername(loginUsername);
       loginField = loginUsername;
+      console.log("[Login] Customer by username:", customer ? `found id=${customer.id}` : "not found");
     }
 
     // ── 3. If not found in WC customers, check WP users (covers admins) ────
@@ -262,16 +292,22 @@ export async function POST(request: NextRequest) {
 
     // ── 4. Verify password against WordPress ───────────────────────────────
     // Primary: use email/username (whatever the user typed)
+    console.log("[Login] Verifying password for loginField:", loginField);
     let passwordOk = await verifyWpPassword(loginField, password);
+    console.log("[Login] Primary verify result:", passwordOk);
 
     // Fallback: try with username if email was used (some WP setups only accept username)
     if (!passwordOk && customer?.username && loginField !== customer.username) {
+      console.log("[Login] Trying fallback with username:", customer.username);
       passwordOk = await verifyWpPassword(customer.username, password);
+      console.log("[Login] Fallback (username) verify result:", passwordOk);
     }
 
     // Fallback: try WP user slug for admin users
     if (!passwordOk && isWpOnlyUser && wpUser?.slug && loginField !== wpUser.slug) {
+      console.log("[Login] Trying WP slug fallback:", wpUser.slug);
       passwordOk = await verifyWpPassword(wpUser.slug, password);
+      console.log("[Login] WP slug fallback verify result:", passwordOk);
     }
 
     if (!passwordOk) {
