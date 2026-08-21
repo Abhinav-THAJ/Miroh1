@@ -17,7 +17,7 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
  * Strategy 2: JWT Authentication plugin → /wp-json/jwt-auth/v1/token
  * Strategy 3: wp-login.php form POST → final fallback
  */
-async function verifyWpPassword(loginField: string, password: string): Promise<boolean> {
+async function verifyWpPassword(loginField: string, password: string, username?: string): Promise<boolean> {
   // ── Strategy 1: Custom WordPress REST endpoint (most reliable) ────────────
   try {
     const res = await fetch(`${WC_BASE}/wp-json/miorah/v1/verify`, {
@@ -35,45 +35,50 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
         console.log("[Auth] Strategy 1 (custom endpoint) succeeded for:", loginField);
         return true;
       }
-      // Explicit 401 = wrong password — don't fall through to other strategies
-      if (res.status === 401) {
-        console.log("[Auth] Strategy 1 returned 401 (wrong password) for:", loginField);
-        return false;
-      }
     }
-    console.log("[Auth] Strategy 1 failed with status:", res.status, "- falling through");
+    if (res.status === 401) {
+      // Custom endpoint explicitly confirmed wrong password — no need to try more
+      console.log("[Auth] Strategy 1 returned 401 (wrong password)");
+      return false;
+    }
+    console.log("[Auth] Strategy 1 status:", res.status, "- falling through");
   } catch (e) {
     console.error("[Auth] Strategy 1 error:", e);
   }
 
   // ── Strategy 2: JWT Authentication Plugin ────────────────────────────────
-  try {
-    const res = await fetch(`${WC_BASE}/wp-json/jwt-auth/v1/token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: loginField, password }),
-      cache: "no-store",
-    });
-    const data = await res.json();
-    if (res.ok && data.token) {
-      console.log("[Auth] Strategy 2 (JWT) succeeded for:", loginField);
-      return true;
+  // JWT only accepts username (not email). We try loginField as-is first, then username param if provided.
+  const jwtTargets = Array.from(new Set([loginField, username].filter(Boolean)));
+  for (const jwtUser of jwtTargets) {
+    try {
+      const res = await fetch(`${WC_BASE}/wp-json/jwt-auth/v1/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: jwtUser, password }),
+        cache: "no-store",
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        console.log("[Auth] Strategy 2 (JWT) succeeded for:", jwtUser);
+        return true;
+      }
+      // ⚠️ Only short-circuit on explicit wrong-password. For invalid_email /
+      // invalid_username the user may still pass via Strategy 3.
+      if (data.code?.includes("incorrect_password")) {
+        console.log("[Auth] Strategy 2 (JWT) confirmed wrong password");
+        return false;
+      }
+      console.log("[Auth] Strategy 2 (JWT) status:", res.status, data.code, "- falling through");
+    } catch (e) {
+      console.error("[Auth] Strategy 2 (JWT) error:", e);
     }
-    // JWT returns 403 for wrong password — don't fall through
-    if (res.status === 403 || (data.code && data.code.includes("incorrect_password"))) {
-      console.log("[Auth] Strategy 2 (JWT) returned wrong password for:", loginField);
-      return false;
-    }
-    console.log("[Auth] Strategy 2 (JWT) failed with status:", res.status, data.code, "- falling through");
-  } catch (e) {
-    console.error("[Auth] Strategy 2 (JWT) error:", e);
   }
 
   // ── Strategy 3: wp-login.php form POST ───────────────────────────────────
-  // WordPress returns 302 on BOTH success and failure:
-  //   Success → redirects to wp-admin or the redirect_to URL
-  //   Failure → redirects back to wp-login.php?error=...  
-  // We distinguish by checking the Location header.
+  // Works for both email and username. WordPress:
+  //   Correct creds  → 302 Location: /wp-admin/ or homepage (NOT wp-login.php)
+  //   Wrong creds    → 200 (renders the error page, no redirect)
+  //   Blocked by CDN → anything non-302 or 302 back to wp-login.php
   try {
     const form = new URLSearchParams({
       log: loginField,
@@ -95,8 +100,6 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
       redirect: "manual",
     });
     const location = res.headers.get("location") || "";
-    // Success: redirects to wp-admin or a non-login URL
-    // Failure: redirects back to wp-login.php (with ?error or ?loggedout)
     const isSuccess = res.status === 302 && !location.includes("wp-login.php");
     console.log("[Auth] Strategy 3 (wp-login.php):", res.status, "location:", location, "success:", isSuccess);
     return isSuccess;
@@ -105,7 +108,6 @@ async function verifyWpPassword(loginField: string, password: string): Promise<b
     return false;
   }
 }
-
 
 /** Look up a WooCommerce customer by email */
 async function getWcCustomerByEmail(email: string) {
@@ -291,24 +293,11 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 4. Verify password against WordPress ───────────────────────────────
-    // Primary: use email/username (whatever the user typed)
-    console.log("[Login] Verifying password for loginField:", loginField);
-    let passwordOk = await verifyWpPassword(loginField, password);
-    console.log("[Login] Primary verify result:", passwordOk);
-
-    // Fallback: try with username if email was used (some WP setups only accept username)
-    if (!passwordOk && customer?.username && loginField !== customer.username) {
-      console.log("[Login] Trying fallback with username:", customer.username);
-      passwordOk = await verifyWpPassword(customer.username, password);
-      console.log("[Login] Fallback (username) verify result:", passwordOk);
-    }
-
-    // Fallback: try WP user slug for admin users
-    if (!passwordOk && isWpOnlyUser && wpUser?.slug && loginField !== wpUser.slug) {
-      console.log("[Login] Trying WP slug fallback:", wpUser.slug);
-      passwordOk = await verifyWpPassword(wpUser.slug, password);
-      console.log("[Login] WP slug fallback verify result:", passwordOk);
-    }
+    // Pass the WC/WP username as a hint so JWT can try it even when loginField is an email.
+    const wcUsername = customer?.username || wpUser?.slug || undefined;
+    console.log("[Login] Verifying password for loginField:", loginField, "| wcUsername hint:", wcUsername);
+    let passwordOk = await verifyWpPassword(loginField, password, wcUsername);
+    console.log("[Login] Verify result:", passwordOk);
 
     if (!passwordOk) {
       return NextResponse.json(
