@@ -131,7 +131,6 @@ export default function CheckoutClient() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   items: items,
-                  customer_id: user?.id,
                   contact: { email: formData.email, phone: formData.phone },
                   shipping: {
                     fullName: formData.fullName,
@@ -188,7 +187,6 @@ export default function CheckoutClient() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             items: items,
-            customer_id: user?.id,
             contact: { email: formData.email, phone: formData.phone },
             shipping: {
               fullName: formData.fullName,
