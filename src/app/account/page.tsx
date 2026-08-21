@@ -1334,6 +1334,14 @@ function AccountPageContent() {
   const router = useRouter();
   const redirectUrl = searchParams.get("redirect") || undefined;
 
+  // Must be defined before any early return (React hooks rules)
+  const handleAuthSuccess = useCallback(async () => {
+    // Re-check the session so the store reads the newly-set cookie
+    // and flips isAuthenticated → true, revealing the Dashboard.
+    await checkSession();
+    setSessionChecked(true);
+  }, [checkSession]);
+
   useEffect(() => {
     if (checkedRef.current) return;
     checkedRef.current = true;
@@ -1360,13 +1368,6 @@ function AccountPageContent() {
       </div>
     );
   }
-
-  const handleAuthSuccess = useCallback(async () => {
-    // Re-check the session so the store reads the newly-set cookie
-    // and flips isAuthenticated → true, revealing the Dashboard.
-    await checkSession();
-    setSessionChecked(true);
-  }, [checkSession]);
 
   return isAuthenticated
     ? <Dashboard />
