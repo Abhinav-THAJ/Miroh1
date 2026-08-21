@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ShieldCheck, Lock, CheckCircle2, User, LogIn } from "lucide-react";
+import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const loadRazorpay = () => {
@@ -25,12 +23,9 @@ const loadRazorpay = () => {
 
 export default function CheckoutClient() {
   const { items, clearCart } = useCartStore();
-  const { isAuthenticated, user, checkSession } = useAuthStore();
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [sessionChecked, setSessionChecked] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -46,41 +41,9 @@ export default function CheckoutClient() {
 
   useEffect(() => {
     setMounted(true);
-    // Always verify session on checkout page
-    checkSession().finally(() => setSessionChecked(true));
-  }, [checkSession]);
+  }, []);
 
-  // Pre-fill email and name from auth store when session is ready
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setFormData(prev => ({
-        ...prev,
-        email: prev.email || user.email || "",
-        fullName: prev.fullName || user.name || "",
-      }));
-
-      // Also try to fetch full customer data for phone/address pre-fill
-      fetch("/api/account/customer")
-        .then(res => res.ok ? res.json() : null)
-        .then(data => {
-          if (data) {
-            setFormData(prev => ({
-              ...prev,
-              phone: prev.phone || data.phone || data.billing?.phone || "",
-              fullName: prev.fullName || `${data.first_name || ""} ${data.last_name || ""}`.trim() || user.name || "",
-              address: prev.address || data.billing?.address_1 || "",
-              city: prev.city || data.billing?.city || "",
-              state: prev.state || data.billing?.state || "",
-              zip: prev.zip || data.billing?.postcode || "",
-              country: prev.country || data.billing?.country || "IN",
-            }));
-          }
-        })
-        .catch(() => { /* ignore */ });
-    }
-  }, [isAuthenticated, user]);
-
-  if (!mounted || !sessionChecked) return null;
+  if (!mounted) return null;
 
   const parseNum = (p: string) => Number(p?.replace(/[^0-9.]/g, "") || 0);
   const subtotal = items.reduce((acc, item) => acc + parseNum(item.price) * item.quantity, 0);
@@ -131,13 +94,6 @@ export default function CheckoutClient() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // If not authenticated, redirect to login with return URL
-    if (!isAuthenticated) {
-      router.push("/account?redirect=/checkout");
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
@@ -276,12 +232,6 @@ export default function CheckoutClient() {
           Your order has been successfully placed. We have sent a confirmation email with your order details.
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
-          <Link
-            href="/account"
-            className="px-8 py-4 bg-luxury-brown border border-champagne-gold/30 text-champagne-gold rounded-xl font-medium tracking-widest uppercase text-sm hover:bg-champagne-gold hover:text-primary-bg transition-colors"
-          >
-            View My Orders
-          </Link>
           <Link 
             href="/"
             className="px-8 py-4 bg-champagne-gold text-primary-bg rounded-xl font-medium tracking-widest uppercase text-sm hover:bg-white transition-colors"
@@ -313,24 +263,6 @@ export default function CheckoutClient() {
     <div className="container mx-auto px-4 lg:px-8">
       <div className="mb-12 text-center md:text-left border-b border-white/10 pb-6">
         <h1 className="text-3xl md:text-4xl font-serif text-warm-ivory">Secure Checkout</h1>
-
-        {/* Auth Status Banner */}
-        <div className="mt-4">
-          {isAuthenticated ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 text-sm">
-              <User size={14} />
-              <span>Checking out as <strong>{user?.name || user?.email}</strong></span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-champagne-gold/10 border border-champagne-gold/20 rounded-xl text-sm">
-              <LogIn size={14} className="text-champagne-gold" />
-              <span className="text-warm-ivory/80">Have an account?</span>
-              <Link href="/account?redirect=/checkout" className="text-champagne-gold font-semibold hover:underline">
-                Sign in for faster checkout
-              </Link>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
