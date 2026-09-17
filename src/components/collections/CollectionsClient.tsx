@@ -93,28 +93,6 @@ export default function CollectionsClient({
             setProductsList(transformed);
           }
         }
-
-        // Fetch Live Categories from WooCommerce REST API
-        const catRes = await fetch(
-          `${cleanBaseUrl}wp-json/wc/v3/products/categories?consumer_key=${ck}&consumer_secret=${cs}&per_page=50&hide_empty=true`
-        );
-        if (catRes.ok) {
-          const wcCats = await catRes.json();
-          if (Array.isArray(wcCats) && wcCats.length > 0) {
-            const filteredCats = wcCats
-              .filter((c: any) => c.slug !== "uncategorized" && c.name.toLowerCase() !== "uncategorized" && c.count > 0)
-              .map((c: any) => ({
-                id: c.id,
-                name: c.name,
-                slug: c.slug,
-                count: c.count,
-              }));
-            setCategoriesList([
-              { id: "all", name: "All", slug: "all", count: productsList.length },
-              ...filteredCats,
-            ]);
-          }
-        }
       } catch (err) {
         console.log("Client live WooCommerce sync active", err);
       } finally {
