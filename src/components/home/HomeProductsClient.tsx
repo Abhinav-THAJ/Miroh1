@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import Hero from "@/components/home/Hero";
 import BestSellers from "@/components/home/BestSellers";
 import NewArrivals from "@/components/home/NewArrivals";
-import { getProducts } from "@/lib/woocommerce";
 import { ALL_PRODUCTS, MOCK_BEST_SELLERS, MOCK_NEW_ARRIVALS } from "@/lib/data";
 
 /**
@@ -21,11 +20,13 @@ export default function HomeProductsClient({ heroAcfData }: { heroAcfData?: any 
     if (fetchedRef.current) return;
     fetchedRef.current = true;
 
-    getProducts().then((wcProducts) => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((wcProducts) => {
       if (wcProducts && wcProducts.length > 0) {
         const fmt = (n: string) => (n ? `₹${parseFloat(n).toLocaleString("en-IN")}` : undefined);
 
-        const formattedNewArrivals = wcProducts.slice(0, 4).map((p, idx) => {
+        const formattedNewArrivals = wcProducts.slice(0, 4).map((p: any, idx: number) => {
           const fallbackImg =
             ALL_PRODUCTS[idx % ALL_PRODUCTS.length]?.images[0] ||
             "/images/products/MI0036/MI0036-1.png";
@@ -41,7 +42,7 @@ export default function HomeProductsClient({ heroAcfData }: { heroAcfData?: any 
           };
         });
 
-        const formattedBestSellers = wcProducts.slice(0, 8).map((p, idx) => {
+        const formattedBestSellers = wcProducts.slice(0, 8).map((p: any, idx: number) => {
           const fallbackObj = ALL_PRODUCTS[idx % ALL_PRODUCTS.length] || ALL_PRODUCTS[0];
           const img1 = p.images?.[0]?.src || fallbackObj.images[0];
           const img2 = p.images?.[1]?.src || fallbackObj.images[1] || img1;

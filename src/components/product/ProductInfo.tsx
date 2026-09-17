@@ -34,12 +34,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   useEffect(() => {
     async function fetchLiveSingleProduct() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-492819.hostingersite.com/";
-        const ck = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "ck_63c6dd09f762e94a24cdf69baa403f302047e645";
-        const cs = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "cs_1708408f09e82b542370d7efece47168f0bf3ba2";
-        const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
-        const res = await fetch(`${cleanBaseUrl}wp-json/wc/v3/products/${product.id}?consumer_key=${ck}&consumer_secret=${cs}`);
+        const res = await fetch(`/api/products?id=${product.id}`);
         if (res.ok) {
           const p = await res.json();
           if (p && p.id) {

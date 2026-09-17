@@ -54,21 +54,12 @@ export default function CollectionsClient({
     }
   }, [searchParams]);
 
-  // Real-time client-side sync from Hostinger WooCommerce REST API
+  // Real-time client-side sync via Next.js server proxy (avoids CORS)
   useEffect(() => {
     async function fetchLiveWooCommerce() {
       setIsLiveSyncing(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-492819.hostingersite.com/";
-        const ck = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "ck_63c6dd09f762e94a24cdf69baa403f302047e645";
-        const cs = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "cs_1708408f09e82b542370d7efece47168f0bf3ba2";
-
-        const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-
-        // Fetch Live Products from WooCommerce REST API
-        const prodRes = await fetch(
-          `${cleanBaseUrl}wp-json/wc/v3/products?consumer_key=${ck}&consumer_secret=${cs}&per_page=50`
-        );
+        const prodRes = await fetch("/api/products?per_page=50");
         if (prodRes.ok) {
           const wcProds = await prodRes.json();
           if (Array.isArray(wcProds) && wcProds.length > 0) {

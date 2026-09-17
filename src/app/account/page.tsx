@@ -184,7 +184,6 @@ function AuthPanel({
   const [regForm, setRegForm] = useState({
     firstName: "",
     lastName: "",
-    username: "",
     email: "",
     phone: "",
     password: "",
@@ -194,7 +193,6 @@ function AuthPanel({
   });
   const [regErrors, setRegErrors] = useState<Record<string, string>>({});
   const [checkingEmail, setCheckingEmail] = useState(false);
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   // Forgot password
   const [forgotEmail, setForgotEmail] = useState("");
@@ -227,25 +225,6 @@ function AuthPanel({
     }, 600);
   };
 
-  // Real-time username check (debounced)
-  const usernameCheckTimer = useRef<NodeJS.Timeout | null>(null);
-  const handleUsernameChange = (val: string) => {
-    setRegForm((p) => ({ ...p, username: val }));
-    setRegErrors((p) => ({ ...p, username: "" }));
-    if (usernameCheckTimer.current) clearTimeout(usernameCheckTimer.current);
-    if (!val || val.length < 3) return;
-    usernameCheckTimer.current = setTimeout(async () => {
-      setCheckingUsername(true);
-      const exists = await checkUsernameExists(val);
-      setCheckingUsername(false);
-      if (exists) {
-        setRegErrors((p) => ({
-          ...p,
-          username: "This username is already taken. Please choose another username.",
-        }));
-      }
-    }, 600);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,7 +257,12 @@ function AuthPanel({
     const data: RegisterData = {
       firstName: regForm.firstName,
       lastName: regForm.lastName,
-      username: regForm.username,
+      // Auto-derive a clean username from email (strip @domain, special chars)
+      username: regForm.email
+        .split("@")[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, "")
+        .slice(0, 30) || `user${Date.now().toString().slice(-6)}`,
       email: regForm.email,
       password: regForm.password,
       confirmPassword: regForm.confirmPassword,
@@ -460,28 +444,6 @@ function AuthPanel({
                     />
                   </div>
 
-                  {/* Username */}
-                  <Field
-                    id="reg-username"
-                    label="Username"
-                    placeholder="your_username"
-                    value={regForm.username}
-                    onChange={handleUsernameChange}
-                    icon={AtSign}
-                    required
-                    autoComplete="username"
-                    hint="3–30 chars, letters, numbers, _ . - only"
-                    error={regErrors.username}
-                    suffix={
-                      checkingUsername ? (
-                        <RefreshCw size={14} className="animate-spin text-muted-text/60" />
-                      ) : regForm.username.length >= 3 && !regErrors.username ? (
-                        <UserCheck size={14} className="text-green-400" />
-                      ) : regErrors.username ? (
-                        <UserX size={14} className="text-red-400" />
-                      ) : null
-                    }
-                  />
 
                   {/* Email */}
                   <Field
@@ -603,7 +565,7 @@ function AuthPanel({
                   <button
                     id="register-submit"
                     type="submit"
-                    disabled={isLoading || checkingEmail || checkingUsername || !!Object.values(regErrors).find(Boolean)}
+                    disabled={isLoading || checkingEmail || !!Object.values(regErrors).find(Boolean)}
                     className={btnPrimary}
                   >
                     {isLoading ? <RefreshCw size={15} className="animate-spin" /> : null}
@@ -1329,10 +1291,12 @@ function Dashboard() {
 function AccountPageContent() {
   const { isAuthenticated, checkSession, isLoading } = useAuthStore();
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [pageToast, setPageToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const checkedRef = useRef(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const redirectUrl = searchParams.get("redirect") || undefined;
+  const reason = searchParams.get("reason");
 
   // Must be defined before any early return (React hooks rules)
   const handleAuthSuccess = useCallback(async () => {
@@ -1347,6 +1311,16 @@ function AccountPageContent() {
     checkedRef.current = true;
     checkSession().finally(() => setSessionChecked(true));
   }, [checkSession]);
+
+  // Show toast when redirected from a protected route
+  useEffect(() => {
+    if (!sessionChecked) return;
+    if (!isAuthenticated && reason === "login_required") {
+      setPageToast({ message: "Please sign in to continue to checkout.", type: "error" });
+    } else if (!isAuthenticated && reason === "session_expired") {
+      setPageToast({ message: "Your session has expired. Please sign in again.", type: "error" });
+    }
+  }, [sessionChecked, isAuthenticated, reason]);
 
   // If already authenticated and there's a redirect param, send them there
   useEffect(() => {
@@ -1369,9 +1343,18 @@ function AccountPageContent() {
     );
   }
 
-  return isAuthenticated
-    ? <Dashboard />
-    : <AuthPanel onSuccess={handleAuthSuccess} redirectUrl={redirectUrl} />;
+  return (
+    <>
+      <AnimatePresence mode="popLayout">
+        {pageToast && (
+          <Toast key="page-toast" message={pageToast.message} type={pageToast.type} onDismiss={() => setPageToast(null)} />
+        )}
+      </AnimatePresence>
+      {isAuthenticated
+        ? <Dashboard />
+        : <AuthPanel onSuccess={handleAuthSuccess} redirectUrl={redirectUrl} />}
+    </>
+  );
 }
 
 export default function AccountPage() {

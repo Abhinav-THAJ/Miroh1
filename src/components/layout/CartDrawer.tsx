@@ -5,9 +5,11 @@ import { X, ShoppingBag, Plus, Minus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 
 export default function CartDrawer() {
   const { items, isOpen, setIsOpen, removeItem, updateQuantity } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
@@ -25,6 +27,10 @@ export default function CartDrawer() {
 
   const handleCheckout = () => {
     setIsOpen(false);
+    if (!isAuthenticated) {
+      router.push("/account?redirect=/checkout&reason=login_required");
+      return;
+    }
     router.push("/checkout");
   };
 

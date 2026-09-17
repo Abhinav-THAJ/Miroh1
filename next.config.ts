@@ -3,11 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
-    // Allow images served from the WordPress/WooCommerce host
     remotePatterns: [
       {
         protocol: "https",
         hostname: "springgreen-rook-492819.hostingersite.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "mediumaquamarine-seahorse-783985.hostingersite.com",
         pathname: "/**",
       },
       {
@@ -21,3 +25,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

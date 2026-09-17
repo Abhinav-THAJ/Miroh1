@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { items, contact, shipping, payment } = body;
+    const { items, contact, shipping, payment, customerId } = body;
 
-    const WC_URL = (process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-492819.hostingersite.com").replace(/\/$/, "");
-    const WC_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || process.env.WC_CONSUMER_KEY || "ck_63c6dd09f762e94a24cdf69baa403f302047e645";
-    const WC_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || process.env.WC_CONSUMER_SECRET || "cs_1708408f09e82b542370d7efece47168f0bf3ba2";
+    const WC_URL = (process.env.NEXT_PUBLIC_WC_URL || "https://mediumaquamarine-seahorse-783985.hostingersite.com").replace(/\/$/, "");
+    const WC_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || process.env.WC_CONSUMER_KEY || "ck_dd465da9c7d294fe083fa7c8f59495746cc3f657";
+    const WC_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || process.env.WC_CONSUMER_SECRET || "cs_54770b3ab360b6fbf2eef1fab03abafd69213a06";
 
     const AUTH_HEADER = "Basic " + Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString("base64");
 
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const isRazorpay = payment === "ONLINE" || payment === "RAZORPAY";
     
     const orderData: any = {
+      customer_id: customerId || 0,
       payment_method: isRazorpay ? "razorpay" : "cod",
       payment_method_title: isRazorpay ? "Razorpay" : "Cash on Delivery",
       set_paid: isRazorpay && body.razorpay_payment_id ? true : false,

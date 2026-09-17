@@ -5,8 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { Search, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import { ALL_PRODUCTS } from "@/lib/data";
 
 const navLinks = [
@@ -27,6 +28,10 @@ export default function Navbar() {
 
   const { scrollY } = useScroll();
   const { toggleCart, items } = useCartStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const initials = user
+    ? (user.firstName?.[0] ?? user.name?.[0] ?? "U").toUpperCase()
+    : null;
 
   
   // Calculate total quantity of items in cart
@@ -244,6 +249,21 @@ export default function Navbar() {
             <Search size={20} strokeWidth={1.5} />
           </button>
 
+          {/* Account Icon */}
+          <Link
+            href="/account"
+            className="hover:text-champagne-gold transition-colors relative flex items-center justify-center"
+            title={isAuthenticated ? `My Account (${user?.name})` : "Sign In"}
+          >
+            {isAuthenticated && initials ? (
+              <span className="w-7 h-7 rounded-full border-2 border-champagne-gold bg-champagne-gold/10 text-champagne-gold text-[11px] font-bold flex items-center justify-center">
+                {initials}
+              </span>
+            ) : (
+              <User size={20} strokeWidth={1.5} />
+            )}
+          </Link>
+
           <button 
             onClick={toggleCart}
             className="hover:text-champagne-gold transition-colors relative"
@@ -321,7 +341,15 @@ export default function Navbar() {
                 )}
               </div>
             ))}
-            
+            {/* Account link */}
+            <Link
+              href="/account"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 font-serif text-2xl text-warm-ivory hover:text-champagne-gold transition-colors"
+            >
+              <User size={22} strokeWidth={1.5} />
+              {isAuthenticated ? `My Account` : "Sign In"}
+            </Link>
 
           </div>
         </div>

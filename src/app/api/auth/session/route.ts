@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
 
     let payload: any;
     try {
-      payload = JSON.parse(Buffer.from(cookie, "base64").toString("utf-8"));
+      let decodedCookie = cookie;
+      if (cookie.includes("%")) {
+        try { decodedCookie = decodeURIComponent(cookie); } catch {}
+      }
+      payload = JSON.parse(Buffer.from(decodedCookie, "base64").toString("utf-8"));
     } catch {
       const r = NextResponse.json(
         { authenticated: false, user: null },

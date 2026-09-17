@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useCartStore } from "./cartStore";
 
 export interface AuthUser {
   id: number;
@@ -67,6 +68,8 @@ export const useAuthStore = create<AuthState>()(
 
           if (data.success && data.user) {
             set({ user: data.user, isAuthenticated: true, isLoading: false });
+            // Restore server-saved cart after login
+            useCartStore.getState().loadServerCart();
             return { success: true, message: data.message };
           }
           set({ isLoading: false });
@@ -90,6 +93,8 @@ export const useAuthStore = create<AuthState>()(
 
           if (json.success && json.user) {
             set({ user: json.user, isAuthenticated: true, isLoading: false });
+            // New account — load any existing server cart (should be empty, but safe to call)
+            useCartStore.getState().loadServerCart();
             return { success: true, message: json.message };
           }
           set({ isLoading: false });
@@ -105,6 +110,8 @@ export const useAuthStore = create<AuthState>()(
           await fetch("/api/auth/logout", { method: "POST" });
         } finally {
           set({ user: null, isAuthenticated: false });
+          // Clear only local browser cart, NOT the server cart!
+          useCartStore.getState().clearCart();
         }
       },
 

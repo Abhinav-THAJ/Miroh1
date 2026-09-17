@@ -1,24 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const WC_BASE = (
-  process.env.NEXT_PUBLIC_WC_URL || "https://springgreen-rook-492819.hostingersite.com"
+  process.env.NEXT_PUBLIC_WC_URL || "https://mediumaquamarine-seahorse-783985.hostingersite.com"
 ).replace(/\/$/, "");
 
-const WC_KEY = process.env.WC_CONSUMER_KEY || "ck_63c6dd09f762e94a24cdf69baa403f302047e645";
-const WC_SECRET = process.env.WC_CONSUMER_SECRET || "cs_1708408f09e82b542370d7efece47168f0bf3ba2";
+const WC_KEY = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "";
+const WC_SECRET = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "";
 const WC_AUTH = `Basic ${Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString("base64")}`;
 
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+// ─── Password Verification ────────────────────────────────────────────────────
 /**
- * verifyWpPassword
  * Strategy 1 (PRIMARY): Custom WP REST endpoint /wp-json/miorah/v1/verify
- *   - Uses WordPress native wp_check_password() — 100% reliable, never blocked
- * Strategy 2: JWT Authentication plugin → /wp-json/jwt-auth/v1/token
- * Strategy 3: wp-login.php form POST → final fallback
+ *   - Uses WordPress native wp_check_password() — 100% reliable
+ *   - Requires the Miorah PHP snippet in functions.php
+ * Strategy 2: JWT Authentication Plugin (/wp-json/jwt-auth/v1/token)
+ * Strategy 3: wp-login.php form POST — final fallback
  */
-async function verifyWpPassword(loginField: string, password: string, username?: string): Promise<boolean> {
-  // ── Strategy 1: Custom WordPress REST endpoint (most reliable) ────────────
+async function verifyWpPassword(
+  loginField: string,
+  password: string,
+  username?: string
+): Promise<boolean> {
+
+  // ── Strategy 1: Custom WordPress REST endpoint ────────────────────────────
   try {
     const res = await fetch(`${WC_BASE}/wp-json/miorah/v1/verify`, {
       method: "POST",
@@ -37,18 +43,19 @@ async function verifyWpPassword(loginField: string, password: string, username?:
       }
     }
     if (res.status === 401) {
-      // Custom endpoint explicitly confirmed wrong password — no need to try more
-      console.log("[Auth] Strategy 1 returned 401 (wrong password)");
-      return false;
+      const data = await res.json().catch(() => ({}));
+      if (data.error === "Wrong password") {
+        console.log("[Auth] Strategy 1 confirmed wrong password");
+        return false;
+      }
     }
     console.log("[Auth] Strategy 1 status:", res.status, "- falling through");
   } catch (e) {
-    console.error("[Auth] Strategy 1 error:", e);
+    console.log("[Auth] Strategy 1 not available (add PHP snippet to functions.php):", (e as Error).message);
   }
 
   // ── Strategy 2: JWT Authentication Plugin ────────────────────────────────
-  // JWT only accepts username (not email). We try loginField as-is first, then username param if provided.
-  const jwtTargets = Array.from(new Set([loginField, username].filter(Boolean)));
+  const jwtTargets = Array.from(new Set([loginField, username].filter(Boolean))) as string[];
   for (const jwtUser of jwtTargets) {
     try {
       const res = await fetch(`${WC_BASE}/wp-json/jwt-auth/v1/token`, {
@@ -59,57 +66,61 @@ async function verifyWpPassword(loginField: string, password: string, username?:
       });
       const data = await res.json();
       if (res.ok && data.token) {
-        console.log("[Auth] Strategy 2 (JWT) succeeded for:", jwtUser);
+        console.log("[Auth] JWT succeeded for:", jwtUser);
         return true;
       }
-      // ⚠️ Only short-circuit on explicit wrong-password. For invalid_email /
-      // invalid_username the user may still pass via Strategy 3.
       if (data.code?.includes("incorrect_password")) {
-        console.log("[Auth] Strategy 2 (JWT) confirmed wrong password");
+        console.log("[Auth] JWT confirmed wrong password");
         return false;
       }
-      console.log("[Auth] Strategy 2 (JWT) status:", res.status, data.code, "- falling through");
+      console.log("[Auth] JWT status:", res.status, data.code, "- trying next");
     } catch (e) {
-      console.error("[Auth] Strategy 2 (JWT) error:", e);
+      console.error("[Auth] JWT error:", e);
     }
   }
 
   // ── Strategy 3: wp-login.php form POST ───────────────────────────────────
-  // Works for both email and username. WordPress:
-  //   Correct creds  → 302 Location: /wp-admin/ or homepage (NOT wp-login.php)
-  //   Wrong creds    → 200 (renders the error page, no redirect)
-  //   Blocked by CDN → anything non-302 or 302 back to wp-login.php
-  try {
-    const form = new URLSearchParams({
-      log: loginField,
-      pwd: password,
-      "wp-submit": "Log In",
-      redirect_to: "/wp-admin/",
-      testcookie: "1",
-    });
-    const res = await fetch(`${WC_BASE}/wp-login.php`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Cookie": "wordpress_test_cookie=WP%20Cookie%20check",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Origin": WC_BASE,
-        "Referer": `${WC_BASE}/wp-login.php`,
-      },
-      body: form.toString(),
-      redirect: "manual",
-    });
-    const location = res.headers.get("location") || "";
-    const isSuccess = res.status === 302 && !location.includes("wp-login.php");
-    console.log("[Auth] Strategy 3 (wp-login.php):", res.status, "location:", location, "success:", isSuccess);
-    return isSuccess;
-  } catch (e) {
-    console.error("[Auth] Strategy 3 (wp-login.php) error:", e);
-    return false;
+  // WordPress accepts email OR username in the `log` field.
+  // Success → 302 redirect NOT pointing back to wp-login.php
+  // Failure → 200 (renders error page) or 302 back to wp-login.php
+  const loginTargets = Array.from(new Set([loginField, username].filter(Boolean))) as string[];
+  for (const target of loginTargets) {
+    try {
+      const form = new URLSearchParams({
+        log: target,
+        pwd: password,
+        "wp-submit": "Log In",
+        redirect_to: "/wp-admin/",
+        testcookie: "1",
+      });
+
+      const res = await fetch(`${WC_BASE}/wp-login.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Cookie: "wordpress_test_cookie=WP%20Cookie%20check",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          Origin: WC_BASE,
+          Referer: `${WC_BASE}/wp-login.php`,
+        },
+        body: form.toString(),
+        redirect: "manual",
+      });
+
+      const location = res.headers.get("location") || "";
+      const isSuccess = res.status === 302 && !location.includes("wp-login.php");
+      console.log("[Auth] wp-login.php for", target, "→", res.status, "loc:", location, "ok:", isSuccess);
+
+      if (isSuccess) return true;
+    } catch (e) {
+      console.error("[Auth] wp-login.php error:", e);
+    }
   }
+
+  return false;
 }
 
-/** Look up a WooCommerce customer by email */
+// ─── WooCommerce customer lookup ──────────────────────────────────────────────
 async function getWcCustomerByEmail(email: string) {
   try {
     const res = await fetch(
@@ -124,7 +135,6 @@ async function getWcCustomerByEmail(email: string) {
   }
 }
 
-/** Look up a WooCommerce customer by username */
 async function getWcCustomerByUsername(username: string) {
   try {
     const res = await fetch(
@@ -140,7 +150,6 @@ async function getWcCustomerByUsername(username: string) {
   }
 }
 
-/** Get full WooCommerce customer data by ID */
 async function getFullWcCustomer(id: number) {
   try {
     const res = await fetch(
@@ -154,7 +163,63 @@ async function getFullWcCustomer(id: number) {
   }
 }
 
-/** Issue the HttpOnly session cookie and return the user object */
+// ─── WP user lookup (covers admin accounts not in WC customers) ───────────────
+async function getWpUserByEmail(email: string) {
+  try {
+    // Search by email prefix / full email
+    const res = await fetch(
+      `${WC_BASE}/wp-json/wp/v2/users?search=${encodeURIComponent(email)}&context=view`,
+      { headers: { Authorization: WC_AUTH }, cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    const users = await res.json();
+    if (!Array.isArray(users) || users.length === 0) return null;
+
+    // Try exact email match first (some WP configs expose email in name field)
+    let match = users.find((u: any) =>
+      u.name?.toLowerCase() === email.toLowerCase()
+    );
+
+    // Fallback: match by slug derived from email (WordPress slugifies the email)
+    if (!match) {
+      const emailSlug = email
+        .toLowerCase()
+        .replace(/@/g, "")    // remove @
+        .replace(/\./g, "")   // remove dots
+        .replace(/[^a-z0-9]/g, ""); // strip special chars
+      match = users.find((u: any) => {
+        const uSlug = (u.slug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        return uSlug === emailSlug || u.slug?.includes(emailSlug.slice(0, 8));
+      });
+    }
+
+    // Last resort: if only 1 result, use it
+    if (!match && users.length === 1) match = users[0];
+
+    return match || null;
+  } catch {
+    return null;
+  }
+}
+
+async function getWpUserByUsername(username: string) {
+  try {
+    const res = await fetch(
+      `${WC_BASE}/wp-json/wp/v2/users?search=${encodeURIComponent(username)}&context=view`,
+      { headers: { Authorization: WC_AUTH }, cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    const users = await res.json();
+    if (!Array.isArray(users)) return null;
+    return users.find((u: any) =>
+      u.slug?.toLowerCase() === username.toLowerCase()
+    ) || (users.length === 1 ? users[0] : null);
+  } catch {
+    return null;
+  }
+}
+
+// ─── Issue session cookie ─────────────────────────────────────────────────────
 function issueSession(user: {
   id: number;
   email: string;
@@ -162,7 +227,10 @@ function issueSession(user: {
   lastName: string;
   username: string;
 }) {
-  const displayName = `${user.firstName} ${user.lastName}`.trim() || user.username || user.email.split("@")[0];
+  const displayName =
+    `${user.firstName} ${user.lastName}`.trim() ||
+    user.username ||
+    user.email.split("@")[0];
 
   const payload = {
     id: user.id,
@@ -200,19 +268,19 @@ function issueSession(user: {
   return response;
 }
 
+// ─── POST /api/auth/login ─────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, username: loginUsername, password } = body;
 
-    // ── 1. Validate inputs ──────────────────────────────────────────────────
+    // 1. Validate inputs
     if (!password) {
       return NextResponse.json(
         { success: false, message: "Password is required." },
         { status: 400 }
       );
     }
-
     if (!email && !loginUsername) {
       return NextResponse.json(
         { success: false, message: "Email address or username is required." },
@@ -220,84 +288,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ── 2. Resolve WooCommerce customer from email OR username ──────────────
-    let customer: any = null;
-    let loginField = ""; // what to pass to wp-login.php
+    const isEmailLogin = !!email;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return NextResponse.json(
-          { success: false, message: "Please enter a valid email address." },
-          { status: 400 }
-        );
-      }
+    if (isEmailLogin && !emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, message: "Please enter a valid email address." },
+        { status: 400 }
+      );
+    }
+
+    // 2. Find the user (WooCommerce customer first, then WP admin user)
+    let customer: any = null;
+    let wpUser: any = null;
+    let loginField = email || loginUsername; // used for wp-login.php
+
+    if (isEmailLogin) {
       customer = await getWcCustomerByEmail(email);
-      loginField = email; // WordPress accepts email as login field since v4.5
-      console.log("[Login] Customer by email:", customer ? `found id=${customer.id}` : "not found");
+      if (!customer) {
+        // Not a WC customer — check WP admin users
+        wpUser = await getWpUserByEmail(email);
+      }
     } else {
       customer = await getWcCustomerByUsername(loginUsername);
-      loginField = loginUsername;
-      console.log("[Login] Customer by username:", customer ? `found id=${customer.id}` : "not found");
-    }
-
-    // ── 3. If not found in WC customers, check WP users (covers admins) ────
-    // Admins and editors are not returned by /wc/v3/customers
-    let isWpOnlyUser = false;
-    let wpUser: any = null;
-
-    if (!customer) {
-      const searchTerm = email || loginUsername;
-      try {
-        const wpRes = await fetch(
-          `${WC_BASE}/wp-json/wp/v2/users?search=${encodeURIComponent(searchTerm)}&context=view`,
-          { headers: { Authorization: WC_AUTH }, cache: "no-store" }
-        );
-        if (wpRes.ok) {
-          const users = await wpRes.json();
-          if (Array.isArray(users) && users.length > 0) {
-            if (email) {
-              // Match by name or slug derived from email prefix
-              wpUser = users.find(
-                (u: any) =>
-                  u.name?.toLowerCase() === email.toLowerCase() ||
-                  u.slug?.toLowerCase() ===
-                    email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "")
-              );
-              // If still not found but only 1 result, take it
-              if (!wpUser && users.length === 1) wpUser = users[0];
-            } else {
-              wpUser =
-                users.find(
-                  (u: any) => u.slug?.toLowerCase() === loginUsername?.toLowerCase()
-                ) || users[0];
-            }
-          }
-        }
-      } catch { /* fall through */ }
-
-      if (!wpUser) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: email
-              ? "No account found with this email address. Please create an account."
-              : "No account found with this username.",
-          },
-          { status: 404 }
-        );
+      if (!customer) {
+        wpUser = await getWpUserByUsername(loginUsername);
       }
-
-      isWpOnlyUser = true;
-      loginField = email || wpUser.slug;
     }
 
-    // ── 4. Verify password against WordPress ───────────────────────────────
-    // Pass the WC/WP username as a hint so JWT can try it even when loginField is an email.
+    if (!customer && !wpUser) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: isEmailLogin
+            ? "No account found with this email address. Please create an account."
+            : "No account found with this username.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // 3. Build the login targets for password verification
+    // For wp-login.php: email works directly. For JWT: need username/slug.
     const wcUsername = customer?.username || wpUser?.slug || undefined;
-    console.log("[Login] Verifying password for loginField:", loginField, "| wcUsername hint:", wcUsername);
-    let passwordOk = await verifyWpPassword(loginField, password, wcUsername);
-    console.log("[Login] Verify result:", passwordOk);
+    console.log("[Login] loginField:", loginField, "| wcUsername:", wcUsername);
+
+    // 4. Verify password
+    const passwordOk = await verifyWpPassword(loginField, password, wcUsername);
+    console.log("[Login] Password verified:", passwordOk);
 
     if (!passwordOk) {
       return NextResponse.json(
@@ -310,28 +348,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ── 5. Password verified — fetch full profile & issue session ──────────
-    if (isWpOnlyUser) {
-      // WordPress admin / editor user (not a WC customer)
+    // 5. Issue session
+    if (customer) {
+      const full = (await getFullWcCustomer(customer.id)) || customer;
       return issueSession({
-        id: wpUser.id,
-        email: email || "",
-        firstName: wpUser.name?.split(" ")[0] || "",
-        lastName: wpUser.name?.split(" ").slice(1).join(" ") || "",
-        username: wpUser.slug || "",
+        id: full.id,
+        email: full.email || email || "",
+        firstName: full.first_name || "",
+        lastName: full.last_name || "",
+        username: full.username || "",
       });
     }
 
-    // Fetch the full WC customer record (includes phone, billing, shipping)
-    const full = (await getFullWcCustomer(customer.id)) || customer;
+    // WP admin / editor user — fetch full details for proper name
+    let wpFirstName = "";
+    let wpLastName = "";
+    let wpDisplayName = wpUser.name || "";
+
+    try {
+      const detailRes = await fetch(
+        `${WC_BASE}/wp-json/wp/v2/users/${wpUser.id}?context=edit`,
+        { headers: { Authorization: WC_AUTH }, cache: "no-store" }
+      );
+      if (detailRes.ok) {
+        const detail = await detailRes.json();
+        wpFirstName = detail.first_name || "";
+        wpLastName  = detail.last_name  || "";
+        wpDisplayName = detail.name || wpUser.name || "";
+      }
+    } catch { /* use fallbacks */ }
+
+    // If still no name, derive from email
+    if (!wpFirstName && !wpLastName) {
+      const nameParts = wpDisplayName.includes("@")
+        ? (email || "").split("@")[0].split(/[._]/)
+        : wpDisplayName.split(" ");
+      wpFirstName = nameParts[0] ? nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1) : "";
+      wpLastName  = nameParts.slice(1).map((n: string) => n.charAt(0).toUpperCase() + n.slice(1)).join(" ");
+    }
 
     return issueSession({
-      id: full.id,
-      email: full.email || email || "",
-      firstName: full.first_name || "",
-      lastName: full.last_name || "",
-      username: full.username || "",
+      id: wpUser.id,
+      email: email || "",
+      firstName: wpFirstName,
+      lastName: wpLastName,
+      username: wpUser.slug || "",
     });
+
   } catch (error) {
     console.error("[Login Error]", error);
     return NextResponse.json(

@@ -1,14 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Protected routes that require an active auth session
-// Note: /account shows the login form itself so we do NOT block it at middleware level.
-// /checkout is NOT blocked either — it shows login prompt inline.
-// We only protect /account/... sub-paths if they exist.
+const PROTECTED_ROUTES = ["/checkout", "/wishlist"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check session cookie validity for protected API routes
+  // ── 1. Protect checkout & wishlist pages ──────────────────────────────────
+  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (isProtected) {
+    const sessionCookie = request.cookies.get("auth_session")?.value;
+
+    if (!sessionCookie) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/account";
+      url.searchParams.set("redirect", pathname);
+      url.searchParams.set("reason", "login_required");
+      return NextResponse.redirect(url);
+    }
+
+    try {
+      const payload = JSON.parse(Buffer.from(sessionCookie, "base64").toString("utf-8"));
+      const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+      if (Date.now() - payload.ts > SESSION_MAX_AGE) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/account";
+        url.searchParams.set("reason", "session_expired");
+        const response = NextResponse.redirect(url);
+        response.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
+        return response;
+      }
+    } catch {
+      const url = request.nextUrl.clone();
+      url.pathname = "/account";
+      const response = NextResponse.redirect(url);
+      response.cookies.set("auth_session", "", { maxAge: 0, path: "/" });
+      return response;
+    }
+  }
+
+  // ── 2. Protect account API routes ─────────────────────────────────────────
   if (pathname.startsWith("/api/account/")) {
     const sessionCookie = request.cookies.get("auth_session")?.value;
 
@@ -33,5 +65,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/account/:path*"],
+  matcher: ["/checkout/:path*", "/wishlist/:path*", "/api/account/:path*"],
 };

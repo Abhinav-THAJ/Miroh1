@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Lock, CheckCircle2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const loadRazorpay = () => {
@@ -22,8 +24,11 @@ const loadRazorpay = () => {
 };
 
 export default function CheckoutClient() {
-  const { items, clearCart } = useCartStore();
+  const { items, clearCart, clearServerCart } = useCartStore();
+  const { isAuthenticated, user, checkSession } = useAuthStore();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -41,9 +46,41 @@ export default function CheckoutClient() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Verify session server-side, then gate access
+    checkSession().then(() => {
+      setAuthChecked(true);
+    });
+  }, [checkSession]);
 
-  if (!mounted) return null;
+  // Pre-fill form with logged-in user data
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || prev.email,
+        fullName: user.firstName && user.lastName
+          ? `${user.firstName} ${user.lastName}`.trim()
+          : user.name || prev.fullName,
+      }));
+    }
+  }, [user]);
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (mounted && authChecked && !isAuthenticated) {
+      router.replace("/account?redirect=/checkout&reason=login_required");
+    }
+  }, [mounted, authChecked, isAuthenticated, router]);
+
+  if (!mounted || !authChecked) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-champagne-gold" size={36} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
 
   const parseNum = (p: string) => Number(p?.replace(/[^0-9.]/g, "") || 0);
   const subtotal = items.reduce((acc, item) => acc + parseNum(item.price) * item.quantity, 0);
@@ -141,6 +178,7 @@ export default function CheckoutClient() {
                     country: formData.country,
                   },
                   payment: formData.payment,
+                  customerId: user?.id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_signature: response.razorpay_signature,
@@ -151,6 +189,7 @@ export default function CheckoutClient() {
               
               setOrderPlaced(true);
               clearCart();
+              clearServerCart(); // wipe saved cart in WooCommerce
             } catch (err) {
               console.error(err);
               alert("Payment successful but order creation failed. Please contact support.");
@@ -197,6 +236,7 @@ export default function CheckoutClient() {
               country: formData.country,
             },
             payment: formData.payment,
+            customerId: user?.id,
           }),
         });
         
@@ -206,6 +246,7 @@ export default function CheckoutClient() {
         
         setOrderPlaced(true);
         clearCart();
+        clearServerCart(); // wipe saved cart in WooCommerce
         setIsSubmitting(false);
       }
     } catch (error) {
